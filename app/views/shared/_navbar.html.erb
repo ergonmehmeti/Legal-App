@@ -1,0 +1,19 @@
+
+<nav class="w-64 p-4 h-screen bg-gray-600 sticky top-0">
+    <div class="flex">
+      <%= image_tag 'logo.png', class: 'w-16' %>
+      <h1 class="text-md py-2 text-gray-50 font-bold md:block">
+        <%= link_to "Kryefaqja", root_path, class: "text-gray-50 hover:underline" %>
+      </h1>
+
+    </div>
+    <ul class="flex flex-col text-gray-50">
+      <% Lawsuit.categories.each do |key, value| %>
+        <li>
+          <%= link_to filtered_lawsuits_path(key), class: "block px-4 py-2 hover:rounded hover:bg-gray-700" do %>
+            <span class="md:inline-block"> <%= value %> </span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+</nav>
