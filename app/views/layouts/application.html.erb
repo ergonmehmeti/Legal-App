@@ -19,9 +19,27 @@
   </head>
 
   <body>
+  <!-- Flash messages -->
+  <!-- Flash Messages -->
+    <div class="container mx-auto px-4 py-4">
+      <% if flash[:notice] %>
+        <div class="mb-4 p-4 rounded bg-blue-100 text-blue-800 border border-blue-300">
+          <p><%= flash[:notice] %></p>
+        </div>
+      <% end %>
+      <% if flash[:alert] %>
+        <div class="mb-4 p-4 rounded bg-red-100 text-red-800 border border-red-300">
+          <p><%= flash[:alert] %></p>
+        </div>
+      <% end %>
+    </div>
     <main class="flex">
       <div class="flex ">
-
+        <% if user_signed_in? %>
+          <%= render 'shared/navbar' %>
+        <% end %>
+      </div>
+      <div class="w-full p-10">
         <%= yield %>
       </div>
     </main>

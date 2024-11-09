@@ -1,24 +1,39 @@
 class Lawsuit < ApplicationRecord
 
   enum category: {
-    lendet_civile: "Lendet Civile",
+    kontestet_punes: "Kontestet e Punes",
+    kontestet_palet_treta: "Kontestet me Pale te Treta",
     lendet_penale: "Lendet Penale",
-    lendet_administrative: "Lendet Administrative"
+    lendet_administrative: "Lendet Administrative",
+    lendet_civile_tk: "Lendet Civile Tk Padites",
+    lendet_arbitrazhit: "Lendet Ne Arbitrazhit",
+    lendet_permbarimore_kreditore: "Lendet Permbarimore TK Kreditor",
+    lendet_permbarimore_debitore: "Lendet Permbarimore TK Debitor"
   }
   enum status: {
+    pending: "Ne Pritje",
     active: "Aktive",
-    pending: "Ne pritje",
     suspended: "Pezulluar",
     finished: "Perfunduar"
   }
 
   attribute :status, :string, default: "Ne pritje"
+  validates :title, presence: true
+  validates :status, presence: true, inclusion: { in: statuses.keys }
+  validates :category, presence: true, inclusion: { in: categories.keys }
 
 
-  # description = pershkrimi i lendes
-  # context_type = natyra e kontekstit
+
+  # description = Pershkrimi i Lendes
+  # context_type = Natyra e Kontekstit
+  # plaintiff = Paditesi
+
 
   def category_value
     self.class.categories[category]
+  end
+
+  def status_value
+    self.class.statuses[status]
   end
 end

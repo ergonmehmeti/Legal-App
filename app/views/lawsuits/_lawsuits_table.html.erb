@@ -6,6 +6,9 @@
           <thead class="bg-white border-b">
           <tr>
             <th scope="col" class="text-sm font-medium text-gray-800 px-6 py-4 text-left">
+              Nr.
+            </th>
+            <th scope="col" class="text-sm font-medium text-gray-800 px-6 py-4 text-left">
               Titulli
             </th>
             <th scope="col" class="text-sm font-medium text-gray-800 px-6 py-4 text-left">
@@ -29,16 +32,19 @@
           </tr>
           </thead>
           <tbody>
-          <% lawsuits.each do |lawsuit| %>
+          <% lawsuits.each_with_index do |lawsuit, index| %>
             <tr class="bg-gray-50 border-b">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
+                <%= index + 1 %>
+              </td>
               <td class="px-6 py-4 whitepsace-nowrap tex-sm font-medium text-gray-800 underline">
-                <%=link_to lawsuit.title, "#" %>
+                <%=link_to lawsuit.title, show_lawsuits_path( category: lawsuit.category, id: lawsuit.id) %>
               </td>
               <td class="px-6 py-4 whitepsace-nowrap tex-sm font-medium text-gray-800 underline">
                 <%= lawsuit.plaintiff.present? ? lawsuit.plaintiff : '#' %>
               </td>
               <td class="px-6 py-4 whitepsace-nowrap tex-sm font-medium text-gray-800 underline">
-                <%= "#" %>
+                <%= lawsuit.lawsuit_number.present? ? lawsuit.lawsuit_number : '#' %>
               </td>
               <td class="px-6 py-4 whitepsace-nowrap tex-sm font-medium text-gray-800 underline">
                 <%= lawsuit.context_type.present? ? lawsuit.context_type : '#' %>
@@ -47,11 +53,11 @@
                 <%= lawsuit.category.present? ? lawsuit.category_value : '' %>
               </td>
               <td class="px-6 py-4 whitepsace-nowrap tex-sm font-medium text-gray-800">
-                <%= lawsuit.status.present? ? lawsuit.status.humanize : '' %>
+                <%= lawsuit.status.present? ? lawsuit.status_value : '' %>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
-                <%= link_to 'Show', "", class: 'text-blue-600 hover:text-blue-900' %>
-                <%= link_to 'Edit', "", class: 'text-green-600 hover:text-green-900 ml-2' %>
+                <%= link_to 'Show', show_lawsuits_path( category: lawsuit.category, id: lawsuit.id), class: 'text-blue-600 hover:text-blue-900' %>
+                <%= link_to 'Edit', edit_lawsuits_path( category: lawsuit.category, id: lawsuit.id ), class: 'text-green-600 hover:text-green-900 ml-2' %>
               </td>
             </tr>
           <% end %>

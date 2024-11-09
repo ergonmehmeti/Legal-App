@@ -1,19 +1,9 @@
-<%= render 'shared/navbar' %>
-<%#
-<div class="min-w pl-4">
-  <h1 class="mb-4">Hello Lawsuits</h1>
-  <%= render 'lawsuits/lawsuits_table' %>
+<div class="flex justify-between items-center">
+  <h1 class="font-bold text-4xl">
+    <%= render_page_title(@category) %>
+  </h1>
+  <%= link_to "Shto Lende", new_lawsuit_path, class: "rounded-lg py-3 px-5 bg-blue-600 text-white block font-medium" %>
 </div>
 
-<div class="w-full">
-
-  <div class="flex justify-between items-center">
-    <h1 class="font-bold text-4xl">
-      <%= render_page_title(@category) %>
-    </h1>
-    <%= link_to "New Lawsuit", "#", class: "rounded-lg py-3 px-5 bg-blue-600 text-white block font-medium" %>
-  </div>
-
-  <%= render 'lawsuits/lawsuits_table', lawsuits: @lawsuits %>
-</div>
+<%= render 'lawsuits/lawsuits_table', lawsuits: @lawsuits %>
 
