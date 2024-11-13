@@ -2,7 +2,7 @@ class LawsuitsController < ApplicationController
   #before_action :set_lawsuit, only: [:show, :edit, :update, :destroy]
   def index
     @category = params[:category] || Lawsuit.categories.keys.first
-    @lawsuits = Lawsuit.where(category: @category)
+    @lawsuits = Lawsuit.where(category: @category).order(created_at: :desc)
   end
 
   def show
@@ -14,6 +14,7 @@ class LawsuitsController < ApplicationController
 
   def new
     @lawsuit = Lawsuit.new
+    @lawsuit.comments.build
   end
 
   def create
@@ -27,11 +28,15 @@ class LawsuitsController < ApplicationController
 
   def edit
     @lawsuit = Lawsuit.find(params[:id])
+    @lawsuit.comments.build
   end
 
   def update
     @lawsuit = Lawsuit.find(params[:id])
-    if @lawsuit.update(lawsuit_params)
+    if lawsuit_params[:pdf_files]
+      @lawsuit.pdf_files.attach(lawsuit_params[:pdf_files])
+    end
+    if @lawsuit.update(lawsuit_params.except(:pdf_files))
       redirect_to show_lawsuits_path( category: @lawsuit.category, id: @lawsuit.id)
     else
       render :edit, status: :unprocessable_entity
@@ -46,15 +51,13 @@ class LawsuitsController < ApplicationController
     else
       flash[:alert] = "Failed to delete the lawsuit."
       redirect_to show_lawsuits_path(category: @lawsuit.category, id: @lawsuit.id)
-
     end
-
-
   end
 
 
   private
   def lawsuit_params
-    params.require(:lawsuit).permit(:title, :category, :status, :description, :context_type, :plaintiff, :lawsuit_claim, :lawsuit_number)
+    params.require(:lawsuit).permit(:title, :category, :status, :description, :context_type, :plaintiff, :lawsuit_claim, :lawsuit_number,
+                                    comments_attributes: [ :id, :content, :user_id ], pdf_files: [])
   end
 end

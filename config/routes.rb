@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
-  resources :lawsuits, only: [:index, :new, :create, :edit, :update, :destroy] do
+  resources :lawsuits, only: [ :index, :new, :create, :edit, :update, :destroy ] do
     collection do
       get "new", action: :new, as: :new
       get ":category/:id/edit", action: :edit, as: :edit
@@ -19,6 +19,7 @@ Rails.application.routes.draw do
       delete ":category/:id", action: :destroy, as: :destroy
     end
   end
+  resources :comments, only: [ :create ]
 
 
   # Defines the root path route ("/")

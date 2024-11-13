@@ -33,6 +33,40 @@
       <strong class="text-gray-600">Pershkrimi:</strong>
       <p class="text-gray-800"><%= @lawsuit.description.present? ? @lawsuit.description : 'N/A' %></p>
     </div>
+    <% if @lawsuit.pdf_files.attached? %>
+      <div class="border rounded-lg p-4 bg-gray-50 mt-4">
+        <strong class="text-gray-600">Attached PDFs:</strong>
+        <ul class="mt-2 space-y-2">
+          <% @lawsuit.pdf_files.each do |pdf| %>
+            <li class="flex items-center">
+              <!-- PDF icon and filename link -->
+              <i class="fas fa-file-pdf text-red-500 mr-2"></i>
+              <%= link_to pdf.filename.to_s, rails_blob_path(pdf, disposition: "inline"), target: "_blank", class: "text-blue-600 hover:underline mr-2" %>
+
+              <!-- Download icon link -->
+              <%= link_to rails_blob_path(pdf, disposition: "attachment"), download: pdf.filename.to_s, class: "text-gray-500 hover:text-gray-700" do %>
+                <i class="fas fa-download ml-2"></i>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+  </div>
+  <!-- New Section: Comments -->
+  <div class="mt-6">
+    <h3 class="text-xl font-semibold text-gray-800">Comments</h3>
+    <div class="space-y-4 mt-4">
+      <% @lawsuit.comments.each do |comment| %>
+        <div class="border rounded-lg p-4 bg-gray-50">
+          <p class="text-gray-800"><%= comment.content %></p>
+          <small class="text-gray-500">
+            Komentoi <%= "#{comment.user.name} #{comment.user.surname} (ID: #{comment.user.kt_id})" %> Data: <%= comment.created_at.strftime('%d.%m.%Y') %>
+          </small>
+        </div>
+      <% end %>
+    </div>
   </div>
 
   <div class="flex justify-center space-x-4 mt-6">

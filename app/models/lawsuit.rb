@@ -1,5 +1,10 @@
 class Lawsuit < ApplicationRecord
 
+  has_many :comments, dependent: :destroy
+  accepts_nested_attributes_for :comments
+  has_many_attached :pdf_files, dependent: :destroy
+
+
   enum category: {
     kontestet_punes: "Kontestet e Punes",
     kontestet_palet_treta: "Kontestet me Pale te Treta",
@@ -28,7 +33,8 @@ class Lawsuit < ApplicationRecord
   # context_type = Natyra e Kontekstit
   # plaintiff = Paditesi
 
-
+  scope :active, -> { where(status: :active) }
+  scope :pending, -> { where(status: :pending) }
   def category_value
     self.class.categories[category]
   end

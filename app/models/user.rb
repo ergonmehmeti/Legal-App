@@ -4,6 +4,8 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
+  has_many :comments
+
   validates :name, :surname, :kt_id, presence: true
   validates :kt_id, numericality: { only_integer: true, greater_than: 0 }
 end
