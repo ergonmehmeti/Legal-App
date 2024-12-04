@@ -1,2 +1,21 @@
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+  <% @chart_data.each do |category_chart| %>
+    <div class="bg-white border border-gray-200 shadow-md rounded-lg p-6">
+      <!-- Chart Title -->
+      <h2 class="text-xl font-bold text-gray-700 text-center mb-4">
+        <%= link_to category_chart[:name], filtered_lawsuits_path(category_chart[:value]), class: "text-grey-900 hover:underline" %>
+      </h2>
 
-
+      <!-- Chart -->
+      <div class="w-full max-w-3xl mx-auto">
+        <%= column_chart category_chart[:data],
+                         height: "300px",
+                         library: {
+                           title: { text: "Lawsuits by Status", fontSize: 16 },
+                           legend: { position: "bottom" }
+                         }
+        %>
+      </div>
+    </div>
+  <% end %>
+</div>

@@ -1,6 +1,6 @@
 <div class="w-full">
   <div class="max-w-3xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center"><%= "Lawsuit Title" %></h1>
+    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center"><%= "Lenda" %></h1>
 
     <%= form_with(model: @lawsuit, local: true) do |form| %>
       <% if form.object.errors.any? %>
@@ -40,6 +40,11 @@
         </div>
 
         <div>
+          <%= form.label :court, 'Gjykata', class: 'block text-gray-600 font-semibold' %>
+          <%= form.select :court, options_for_select(Lawsuit.courts.map { |key, value| [value, key] }, form.object.court), { prompt: '' }, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+        </div>
+
+        <div>
           <%= form.label :status, 'Statusi i Lendes', class: 'block text-gray-600 font-semibold' %>
           <%= form.select :status, options_for_select(Lawsuit.statuses.map { |key, value| [value, key] }, selected: (form.object.status || 'pending')), { prompt: '' }, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
         </div>
@@ -51,7 +56,7 @@
         <!-- Display Existing PDF Files -->
         <% if @lawsuit.pdf_files.attached? %>
           <div class="border rounded-lg p-4 bg-gray-50 mt-4">
-            <strong class="text-gray-600">Existing PDFs:</strong>
+            <strong class="text-gray-600">Dokumentet Egzistuese:</strong>
             <ul class="mt-2 space-y-2">
               <% @lawsuit.pdf_files.each do |pdf| %>
                 <li>
@@ -62,8 +67,8 @@
           </div>
         <% end %>
         <div>
-          <%= form.label :pdf_files, 'Attach PDF Files', class: 'block text-gray-600 font-semibold' %>
-          <%= form.file_field :pdf_files, multiple: true, accept: "application/pdf", class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+          <%= form.label :pdf_files, 'Shto PDF Dokumente', class: 'block text-gray-600 font-semibold' %>
+          <%= form.file_field :pdf_files, multiple: true, accept: "application/pdf", class: 'p-2 border border-gray-300 rounded w-full' %>
         </div>
       </div>
       <div class="mt-8">
@@ -84,12 +89,14 @@
 
       <div class="flex justify-center space-x-4 mt-6">
         <% if @lawsuit.new_record? %>
-          <%= form.submit 'Create Lawsuit', class: 'bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition' %>
+          <%= form.submit 'Krijo Lëndën', class: 'bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition' %>
         <% else %>
-          <%= form.submit 'Save Lawsuit', class: 'bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition' %>
+          <% if !current_user.operator? %>
+            <%= form.submit 'Ruaj Ndryshimet', class: 'bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition' %>
+          <% end %>
         <% end %>
 
-        <%= link_to 'Cancel', lawsuits_path, class: 'bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition' %>
+        <%= link_to 'Kthehu Prapa', lawsuits_path, class: 'bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition' %>
       </div>
 
     <% end %>
