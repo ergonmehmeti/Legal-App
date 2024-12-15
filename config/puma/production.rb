@@ -6,6 +6,7 @@ threads threads_count, threads_count
 port ENV.fetch("PORT", 3000)
 
 # Env
+environment ENV.fetch("RAILS_ENV") { "production" }
 workers Integer(ENV.fetch("WEB_CONCURRENCY", 6))
 
 preload_app!
