@@ -59,7 +59,7 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "tailwindcss-rails", "~> 3.0"
+gem "tailwindcss-rails", "~> 3.1"
 gem "devise", "~> 4.9"
 gem "font-awesome-sass"
 gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
