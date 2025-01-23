@@ -4,24 +4,11 @@
       <thead class="bg-white border-b">
       <tr>
         <th scope="col" class="text-sm font-medium text-gray-800 px-6 py-4 text-left">Nr.</th>
-        <th scope="col" class="text-sm font-medium text-gray-800 px-6 py-4 text-left">Numri TK</th>
-        <th scope="col" class="text-sm font-medium text-gray-800 px-6 py-4 text-left">
-          <%= case @category
-              when "lendet_permbarimore_kreditore"
-                "Kreditori"
-              when "lendet_permbarimore_debitore"
-                "Debitori"
-              when "lendet_penale"
-                "Paraqitësi i Kallëzimit"
-              else
-                "Paditësi"
-              end %>
-        </th>
-        <th scope="col" class="text-sm font-medium text-gray-800 px-6 py-4 text-left">Numri i Lëndës</th>
-        <th scope="col" class="text-sm font-medium text-gray-800 px-6 py-4 text-left">Natyra e Kontestit</th>
-        <% unless %w[lendet_penale lendet_administrative_inspektoriat lendet_administrative].include?(@category) %>
-          <th scope="col" class="text-sm font-medium text-gray-800 px-6 py-4 text-left">Gjykata</th>
-        <% end %>
+        <th scope="col" class="text-sm font-medium text-gray-800 px-6 py-4 text-left">Titulli</th>
+        <th scope="col" class="text-sm font-medium text-gray-800 px-6 py-4 text-left">Paditesi</th>
+        <th scope="col" class="text-sm font-medium text-gray-800 px-6 py-4 text-left">Numri i Lendes</th>
+        <th scope="col" class="text-sm font-medium text-gray-800 px-6 py-4 text-left">Natyra e Kontekstit</th>
+        <th scope="col" class="text-sm font-medium text-gray-800 px-6 py-4 text-left">Gjykata</th>
         <th scope="col" class="text-sm font-medium text-gray-800 px-6 py-4 text-left">Statusi</th>
         <th scope="col" class="text-sm font-medium text-gray-800 px-6 py-4 text-center">Veprime</th>
       </tr>
@@ -42,11 +29,10 @@
           <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 underline">
             <%= lawsuit.context_type.present? ? lawsuit.context_type : '#' %>
           </td>
-          <% unless %w[lendet_penale lendet_administrative_inspektoriat lendet_administrative].include?(@category) %>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
-              <%= lawsuit.court.present? ? lawsuit.court_value : '' %>
-            </td>
-          <% end %>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
+            <%= lawsuit.court.present? ? lawsuit.court_value : '' %>
+          </td>
+
           <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
             <%= lawsuit.status.present? ? lawsuit.status_value : '' %>
           </td>
@@ -60,5 +46,3 @@
     </table>
   </div>
 
-
-<div> <%= @category %></div>

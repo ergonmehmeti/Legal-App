@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_30_155901) do
+ActiveRecord::Schema[7.2].define(version: 2025_01_17_095220) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -61,6 +61,14 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_30_155901) do
     t.string "lawsuit_claim"
     t.string "lawsuit_number"
     t.string "court"
+    t.decimal "lawsuit_amount_claim"
+    t.decimal "provision"
+    t.string "lawsuit_risk"
+    t.string "lawsuit_state"
+    t.string "civil_lawsuit"
+    t.string "lawsuit_phase_procedure"
+    t.string "institution"
+    t.string "lawsuit_development_procedure"
   end
 
   create_table "users", force: :cascade do |t|

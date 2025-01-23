@@ -26,7 +26,7 @@ class LawsuitsController < ApplicationController
   end
 
   def new
-    @lawsuit = Lawsuit.new
+    @lawsuit = Lawsuit.new(category: params[:category])
     @lawsuit.comments.build
   end
 
@@ -73,6 +73,8 @@ class LawsuitsController < ApplicationController
   private
   def lawsuit_params
     params.require(:lawsuit).permit(:title, :category, :status, :description, :context_type, :plaintiff, :lawsuit_claim, :lawsuit_number, :court,
+                                    :lawsuit_amount_claim, :lawsuit_risk, :provision, :lawsuit_state, :lawsuit_development_procedure, :civil_lawsuit,
+                                    :institution, :lawsuit_phase_procedure,
                                     comments_attributes: [ :id, :content, :user_id ], pdf_files: [])
   end
 end

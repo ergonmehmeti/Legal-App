@@ -59,6 +59,7 @@ group :test do
   gem "selenium-webdriver"
 end
 
+
 gem "tailwindcss-rails", "~> 3.0"
 gem "devise", "~> 4.9"
 gem "font-awesome-sass"

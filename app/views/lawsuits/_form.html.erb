@@ -15,22 +15,43 @@
 
       <div class="space-y-4">
         <div>
-          <%= form.label :title, 'Titulli', class: 'block text-gray-600 font-semibold' %>
+          <%= form.label :title, 'Numri TK', class: 'block text-gray-600 font-semibold' %>
           <%= form.text_field :title, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
         </div>
+        <% if form.object.category == "lendet_penale"%>
+          <div>
+            <%= form.label :plaintiff, 'Paraqitesi i Kallëzimit', class: 'block text-gray-600 font-semibold' %>
+            <%= form.text_field :plaintiff, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+          </div>
+          <div>
+            <%= form.label :lawsuit_claim, 'I Pandehuri ', class: 'block text-gray-600 font-semibold' %>
+            <%= form.text_field :lawsuit_claim, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+            </div>
+        <% elsif form.object.category == "lendet_permbarimore_kreditore" %>
+          <div>
+            <%= form.label :plaintiff, 'Kreditori', class: 'block text-gray-600 font-semibold' %>
+            <%= form.text_field :plaintiff, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+          </div>
+        <% elsif form.object.category == "lendet_permbarimore_debitore" %>
+          <div>
+            <%= form.label :plaintiff, 'Debitori', class: 'block text-gray-600 font-semibold' %>
+            <%= form.text_field :plaintiff, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+          </div>
+        <% else %>
+          <div>
+            <%= form.label :plaintiff, 'Paditësi', class: 'block text-gray-600 font-semibold' %>
+            <%= form.text_field :plaintiff, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+          </div>
+        <% end %>
 
-        <div>
-          <%= form.label :plaintiff, 'Paditesi', class: 'block text-gray-600 font-semibold' %>
-          <%= form.text_field :plaintiff, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
-        </div>
 
-        <div>
-          <%= form.label :lawsuit_number, 'Numri i Lendes', class: 'block text-gray-600 font-semibold' %>
+      <div>
+          <%= form.label :lawsuit_number, 'Numri i Lëndës', class: 'block text-gray-600 font-semibold' %>
           <%= form.text_field :lawsuit_number, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
         </div>
 
         <div>
-          <%= form.label :context_type, 'Natyra e Kontekstit', class: 'block text-gray-600 font-semibold' %>
+          <%= form.label :context_type, 'Natyra e Kontestit', class: 'block text-gray-600 font-semibold' %>
           <%= form.text_field :context_type, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
         </div>
 
@@ -39,18 +60,93 @@
           <%= form.select :category, options_for_select(Lawsuit.categories.map { |key, value| [value, key] }, form.object.category), { prompt: '' }, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
         </div>
 
-        <div>
-          <%= form.label :court, 'Gjykata', class: 'block text-gray-600 font-semibold' %>
-          <%= form.select :court, options_for_select(Lawsuit.courts.map { |key, value| [value, key] }, form.object.court), { prompt: '' }, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
-        </div>
+        <% if %w[lendet_penale lendet_administrative_inspektoriat lendet_administrative].exclude?(form.object.category) %>
+          <div>
+            <%= form.label :court, 'Gjykata', class: 'block text-gray-600 font-semibold' %>
+            <%= form.select :court,
+                            options_for_select(Lawsuit.courts.map { |key, value| [value, key] }, form.object.court),
+                            { prompt: '' },
+                            class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+          </div>
+        <% end %>
+
+        <% if %w[lendet_penale lendet_administrative_inspektoriat lendet_administrative].include?(form.object.category) %>
+          <div>
+            <%= form.label :lawsuit_state, 'Gjendja e Lëndës', class: 'block text-gray-600 font-semibold' %>
+            <%= form.select :lawsuit_state,
+                            options_for_select(form.object.lawsuit_state_options_for_select.map { |key, value| [value, key] }, form.object.lawsuit_state),
+                            { prompt: 'Zgjidh Gjendjen' },
+                            class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+          </div>
+        <% end %>
+
+        <% if     %w[lendet_penale lendet_administrative_inspektoriat lendet_administrative
+                    lendet_permbarimore_debitore lendet_permbarimore_kreditore].include?(form.object.category) %>
+          <div>
+            <% if form.object.category == "lendet_penale"%>
+              <%= form.label :lawsuit_phase_procedure, 'Faza e Kallëzimit Penal', class: 'block text-gray-600 font-semibold' %>
+            <% elsif form.object.category == "lendet_administrative_inspektoriat"  || form.object.category == "lendet_administrative_inspektoriat"%>
+              <%= form.label :lawsuit_phase_procedure, 'Faza e Procedurës', class: 'block text-gray-600 font-semibold' %>
+            <% else %>
+              <%= form.label :lawsuit_phase_procedure, 'Zhvillimi i Procedurës', class: 'block text-gray-600 font-semibold' %>
+             <% end %>
+            <%= form.select :lawsuit_phase_procedure,
+                            options_for_select(form.object.lawsuit_phase_procedure_options_for_select.map { |key, value| [value, key] }, form.object.lawsuit_phase_procedure),
+                            { prompt: 'Përzgjedh' },
+                            class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+          </div>
+        <% end %>
+
 
         <div>
           <%= form.label :status, 'Statusi i Lendes', class: 'block text-gray-600 font-semibold' %>
           <%= form.select :status, options_for_select(Lawsuit.statuses.map { |key, value| [value, key] }, selected: (form.object.status || 'pending')), { prompt: '' }, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
         </div>
 
+
+
+        <% if form.object.category != "lendet_penale" %>
+
+          <div class="relative">
+            <%= form.label :lawsuit_amount_claim, 'Shuma e Kërkesës/Gjobës', class: 'block text-gray-600 font-semibold' %>
+            <div class="mt-1 flex rounded border border-gray-300">
+              <span class="inline-flex items-center px-3 text-gray-600 bg-gray-100 border-r border-gray-300">
+                €
+              </span>
+              <%= form.number_field :lawsuit_amount_claim, step: 0.01, min: 0, class: 'w-full p-2 border-none focus:ring-0 focus:outline-none' %>
+            </div>
+          </div>
+        <% end %>
+
+        <% unless %w[lendet_penale lendet_administrative_inspektoriat lendet_administrative].include?(form.object.category) %>
+          <div class="relative">
+            <%= form.label :provision, 'Provizionimi', class: 'block text-gray-600 font-semibold' %>
+            <div class="mt-1 flex rounded border border-gray-300">
+            <span class="inline-flex items-center px-3 text-gray-600 bg-gray-100 border-r border-gray-300">
+              €
+            </span>
+              <%= form.number_field :provision, step: 0.01, min: 0, class: 'w-full p-2 border-none focus:ring-0 focus:outline-none' %>
+            </div>
+          </div>
+
+          <div>
+            <%= form.label :lawsuit_risk, 'Rreziku', class: 'block text-gray-600 font-semibold' %>
+            <%= form.select :lawsuit_risk, options_for_select(Lawsuit.lawsuit_risks.map { |key, value| [value, key] }, selected: (form.object.lawsuit_risk || 'ulet')), { prompt: '' }, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+          </div>
+        <% end %>
+
+
+        <% if form.object.category == "lendet_penale" %>
+          <div>
+            <%= form.label :civil_lawsuit, 'Padi Civile', class: 'block text-gray-600 font-semibold' %>
+            <%= form.select :civil_lawsuit, options_for_select(Lawsuit.civil_lawsuits.map { |key, value| [value, key] }, selected: (form.object.civil_lawsuit )), { prompt: '' }, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+          </div>
+        <% end %>
+
+
+
         <div>
-          <%= form.label :description, 'Pershkrimi i Lendes', class: 'block text-gray-600 font-semibold' %>
+          <%= form.label :description, 'Përshkrimi i Lëndës', class: 'block text-gray-600 font-semibold' %>
           <%= form.text_area :description, rows: 5, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
         </div>
         <!-- Display Existing PDF Files -->
@@ -102,3 +198,5 @@
     <% end %>
   </div>
 </div>
+
+

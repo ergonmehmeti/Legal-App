@@ -4,6 +4,11 @@
   <div class="space-y-4">
     <div class="flex justify-between items-center">
       <div>
+        <strong class="text-gray-600">Numri TK:</strong>
+        <p class="text-gray-800"><%= @lawsuit.title.present? ? @lawsuit.title : 'N/A' %></p>
+      </div>
+
+      <div>
         <strong class="text-gray-600">Paditesi:</strong>
         <p class="text-gray-800"><%= @lawsuit.plaintiff.present? ? @lawsuit.plaintiff : 'N/A' %></p>
       </div>
@@ -18,13 +23,33 @@
         <p class="text-gray-800"><%= @lawsuit.status.present? ? @lawsuit.status.humanize : 'N/A' %></p>
       </div>
 
-      <div>
-        <strong class="text-gray-600">Gjykata:</strong>
-        <p class="text-gray-800"><%= @lawsuit.court.present? ? @lawsuit.court_value : 'N/A' %></p>
-      </div>
-    </div>
 
-    <div class="border rounded-lg p-4 bg-gray-50">
+    </div>
+    <div class="space-y-4">
+      <div class="flex justify-between items-center">
+        <div>
+          <strong class="text-gray-600">Gjykata:</strong>
+          <p class="text-gray-800"><%= @lawsuit.court.present? ? @lawsuit.court_value : 'N/A' %></p>
+        </div>
+        <div>
+          <strong class="text-gray-600">Numri i Lendes:</strong>
+          <p class="text-gray-800"><%= @lawsuit.lawsuit_number.present? ? @lawsuit.lawsuit_number : 'N/A' %></p>
+        </div>
+
+        <div>
+          <strong class="text-gray-600">Statusi:</strong>
+          <p class="text-gray-800"><%= @lawsuit.status.present? ? @lawsuit.status.humanize : 'N/A' %></p>
+        </div>
+
+        <div>
+          <strong class="text-gray-600">Gjykata:</strong>
+          <p class="text-gray-800"><%= @lawsuit.court.present? ? @lawsuit.court_value : 'N/A' %></p>
+        </div>
+
+      </div>
+
+
+      <div class="border rounded-lg p-4 bg-gray-50">
       <strong class="text-gray-600">Natyra e Kontekstit:</strong>
       <p class="text-gray-800"><%= @lawsuit.context_type.present? ? @lawsuit.context_type : 'N/A' %></p>
     </div>
