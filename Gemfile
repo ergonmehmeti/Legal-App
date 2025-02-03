@@ -60,7 +60,7 @@ group :test do
 end
 
 
-gem "tailwindcss-rails", "~> 3.0"
+gem "tailwindcss-rails", "~> 4.0"
 gem "devise", "~> 4.9"
 gem "font-awesome-sass"
 gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
