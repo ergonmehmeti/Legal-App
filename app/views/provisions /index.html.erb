@@ -1,0 +1,46 @@
+<table class="min-w-full table-auto">
+  <thead class="bg-gray-300">
+  <tr>
+    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Kategoria</th>
+    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Vlera Totale e Provizionimeve</th>
+    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Provizionimet e Shpërndara në Vite</th>
+  </tr>
+  </thead>
+  <tbody class="divide-y divide-gray-200 bg-gray-100">
+  <% @grouped_by_category.each do |category, data| %>
+    <tr class="hover:bg-gray-200">
+      <td class="border px-6 py-4 text-sm font-medium text-gray-900"><%= category %></td>
+      <td class="border px-6 py-4 text-sm font-medium text-gray-900">
+        <%= number_to_currency(data[:total_sum], unit: "€") %>
+      </td>
+      <td class="border px-6 py-4 text-sm text-gray-900">
+        <ul class="list-disc pl-6">
+          <% data[:years].each do |year, details| %>
+            <li>
+              <strong class="font-semibold">Provizionimet e Vitit <%= year %>:</strong>
+              <%= number_to_currency(details[:sum], unit: "€") %>
+            </li>
+          <% end %>
+        </ul>
+      </td>
+    </tr>
+  <% end %>
+  <tr class="hover:bg-gray-200">
+    <td class="border px-6 py-4 text-sm font-medium text-gray-900">Të gjitha kategoritë</td>
+    <td class="border px-6 py-4 text-sm font-medium text-gray-900">
+      <%= number_to_currency(@grouped_by_year[:total_sum], unit: "€") %>
+    </td>
+    <td class="border px-6 py-4 text-sm font-medium text-gray-900">
+      <ul class="list-disc pl-6">
+        <% @grouped_by_year[:provisions_by_year].each do |year, details| %>
+          <li>
+            <strong class="font-semibold">Provizionimet e Vitit <%= year %>:</strong>
+            <%= number_to_currency(details[:sum], unit: "€") %>
+          </li>
+        <% end %>
+      </ul>
+    </td>
+  </tr>
+  </tbody>
+</table>
+

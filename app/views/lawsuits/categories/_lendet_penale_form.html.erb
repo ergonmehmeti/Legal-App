@@ -1,0 +1,36 @@
+<div class="flex justify-between items- gap-x-8">
+  <div>
+    <strong class="text-gray-600">Numri TK:</strong>
+    <p class="text-gray-800"><%= @lawsuit.title.present? ? @lawsuit.title : 'N/A' %></p>
+  </div>
+  <div>
+    <strong class="text-gray-600">Numri i Lendes:</strong>
+    <p class="text-gray-800"><%= @lawsuit.lawsuit_number.present? ? @lawsuit.lawsuit_number : 'N/A' %></p>
+  </div>
+  <div>
+    <strong class="text-gray-600">Paraqitesi i Kallëzimit</strong>
+    <p class="text-gray-800"><%= @lawsuit.plaintiff.present? ? @lawsuit.plaintiff : 'N/A' %></p>
+  </div>
+  <div>
+    <strong class="text-gray-600">I Pandehuri:</strong>
+    <p class="text-gray-800"><%= @lawsuit.lawsuit_claim.present? ? @lawsuit.lawsuit_claim : 'N/A' %></p>
+  </div>
+</div>
+<div class="flex justify-between items-center gap-x-8">
+  <div>
+    <strong class="text-gray-600">Gjendja e Lëndës:</strong>
+    <p class="text-gray-800"><%= @lawsuit.lawsuit_state.present? ? @lawsuit.enum_value(:lawsuit_state) : 'N/A' %></p>
+  </div>
+  <div>
+    <strong class="text-gray-600">Faza e Kallëzimit Penal:</strong>
+    <p class="text-gray-800"><%= @lawsuit.lawsuit_phase_procedure.present? ? @lawsuit.enum_value(:lawsuit_phase_procedure) : 'N/A' %></p>
+  </div>
+  <div>
+    <strong class="text-gray-600">Padi Civile:</strong>
+    <p class="text-gray-800"><%= @lawsuit.civil_lawsuit.present? ? @lawsuit.enum_value(:civil_lawsuit) : 'N/A' %></p>
+  </div>
+  <div>
+    <strong class="text-gray-600">Statusi:</strong>
+    <p class="text-gray-800"><%= @lawsuit.status.present? ? @lawsuit.enum_value(:status) : 'N/A' %></p>
+  </div>
+</div>

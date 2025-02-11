@@ -44,11 +44,11 @@
           </td>
           <% unless %w[lendet_penale lendet_administrative_inspektoriat lendet_administrative].include?(@category) %>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
-              <%= lawsuit.court.present? ? lawsuit.court_value : '' %>
+              <%= lawsuit.court.present? ? lawsuit.enum_value(:court) : '' %>
             </td>
           <% end %>
           <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
-            <%= lawsuit.status.present? ? lawsuit.status_value : '' %>
+            <%= lawsuit.status.present? ? lawsuit.enum_value(:status) : '' %>
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
             <%= link_to 'Detajet', show_lawsuits_path(category: lawsuit.category, id: lawsuit.id), class: 'px-4 py-2 border border-gray-500 text-gray-500 rounded hover:bg-gray-500 hover:text-white transition' %>
@@ -59,6 +59,3 @@
       </tbody>
     </table>
   </div>
-
-
-<div> <%= @category %></div>

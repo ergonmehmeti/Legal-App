@@ -3,6 +3,10 @@ class Lawsuit < ApplicationRecord
   has_many :comments, dependent: :destroy
   accepts_nested_attributes_for :comments, reject_if: proc { |attributes| attributes['id'].present? }
   has_many_attached :pdf_files, dependent: :destroy
+  has_many :provisions, dependent: :destroy
+  accepts_nested_attributes_for :provisions, reject_if: proc { |attributes| attributes['id'].present? }
+
+
 
 
   enum category: {
@@ -67,9 +71,12 @@ class Lawsuit < ApplicationRecord
     shkalla_pare_inspektoriat: "Vendimi i shkallës së parë të Inspektoratit",
     shkalla_dyte_inspektoriat: "Vendimi i shkallës së dytë të Inspektoratit",
     inspektoriat_rigjykim_pare: "Vendimi i shkallës së parë të Inspektoratit Rigjykim",
-    inspektoriat_rigjykim_dyte: "Vendimi i shkallës së ëytë të Inspektoratit Rrigjykim"
+    inspektoriat_rigjykim_dyte: "Vendimi i shkallës së dytë të Inspektoratit Rrigjykim"
   }
   attribute :status, :string, default: "Në Pritje"
+
+  before_validation :reject_empty_provisions
+
   validates :title, presence: true
   validates :status, presence: true, inclusion: { in: statuses.keys }
   validates :category, presence: true, inclusion: { in: categories.keys }
@@ -105,15 +112,11 @@ class Lawsuit < ApplicationRecord
   def category_value
     self.class.categories[category]
   end
-  def status_value
-    self.class.statuses[status]
+
+  def enum_value(attribute)
+    self.class.public_send(attribute.to_s.pluralize)[public_send(attribute)]
   end
-  def court_value
-    self.class.courts[court]
-  end
-  def lawsuit_risk_value
-    self.class.lawsuit_risks[lawsuit_risk]
-  end
+
   def requires_lawsuit_state?
     %w[lendet_penale lendet_administrative_inspektoriat lendet_administrative].include?(category)
   end
@@ -155,7 +158,7 @@ class Lawsuit < ApplicationRecord
         shkalla_pare_inspektoriat: "Vendimi i shkallës së parë të Inspektoratit",
         shkalla_dyte_inspektoriat: "Vendimi i shkallës së dytë të Inspektoratit",
         inspektoriat_rigjykim_pare: "Vendimi i shkallës së parë të Inspektoratit Rigjykim",
-        inspektoriat_rigjykim_dyte: "Vendimi i shkallës së ëytë të Inspektoratit Rrigjykim"
+        inspektoriat_rigjykim_dyte: "Vendimi i shkallës së dytë të Inspektoratit Rrigjykim"
 
       }
     elsif category == "lendet_permbarimore_debitore" || category == "lendet_permbarimore_kreditore"
@@ -166,6 +169,11 @@ class Lawsuit < ApplicationRecord
     else
       {}
     end
+  end
+
+  def reject_empty_provisions
+    # Only keep provisions where at least one of provision_value or provision_year is not blank
+    self.provisions = provisions.select { |provision| provision.provision_value.present? && provision.provision_year.present? }
   end
 
   def self.important_lawsuits(category)

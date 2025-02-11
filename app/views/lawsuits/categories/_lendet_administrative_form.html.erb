@@ -1,0 +1,35 @@
+<div class="flex justify-between items-center gap-x-8">
+  <div>
+    <strong class="text-gray-600">Numri TK:</strong>
+    <p class="text-gray-800"><%= @lawsuit.title.present? ? @lawsuit.title : 'N/A' %></p>
+  </div>
+  <div>
+    <strong class="text-gray-600">Numri i Lendes:</strong>
+    <p class="text-gray-800"><%= @lawsuit.lawsuit_number.present? ? @lawsuit.lawsuit_number : 'N/A' %></p>
+  </div>
+  <div>
+    <strong class="text-gray-600">Paditesi:</strong>
+    <p class="text-gray-800"><%= @lawsuit.plaintiff.present? ? @lawsuit.plaintiff : 'N/A' %></p>
+  </div>
+  <div>
+    <strong class="text-gray-600">Statusi:</strong>
+    <p class="text-gray-800"><%= @lawsuit.status.present? ? @lawsuit.enum_value(:status) : 'N/A' %></p>
+  </div>
+</div>
+<div class="flex justify-between items-center gap-x-8">
+  <div>
+    <strong class="text-gray-600">Gjendja e Lëndës:</strong>
+    <p class="text-gray-800"><%= @lawsuit.lawsuit_state.present? ? @lawsuit.enum_value(:lawsuit_state) : 'N/A' %></p>
+  </div>
+  <div>
+    <strong class="text-gray-600">Faza e Procedurës:</strong>
+    <p class="text-gray-800"><%= @lawsuit.lawsuit_phase_procedure.present? ? @lawsuit.enum_value(:lawsuit_phase_procedure) : 'N/A' %></p>
+  </div>
+
+  <div>
+    <strong class="text-gray-600">Shuma e Kërkesës/Gjobës:</strong>
+    <p class="text-gray-800">
+      <%= @lawsuit.lawsuit_amount_claim.present? ? number_to_currency(@lawsuit.lawsuit_amount_claim, unit: "€ ", delimiter: ".", separator: ",") : 'N/A' %>
+    </p>
+  </div>
+</div>

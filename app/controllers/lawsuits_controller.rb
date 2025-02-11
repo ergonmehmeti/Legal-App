@@ -28,12 +28,13 @@ class LawsuitsController < ApplicationController
   def new
     @lawsuit = Lawsuit.new(category: params[:category])
     @lawsuit.comments.build
+    @lawsuit.provisions.build
   end
 
   def create
     @lawsuit = Lawsuit.new(lawsuit_params)
     if @lawsuit.save
-      redirect_to show_lawsuits_path( category: @lawsuit.category, id: @lawsuit.id)
+      redirect_to show_lawsuits_path(category: @lawsuit.category, id: @lawsuit.id)
     else
       render :new, status: :unprocessable_entity
     end
@@ -42,6 +43,7 @@ class LawsuitsController < ApplicationController
   def edit
     @lawsuit = Lawsuit.find(params[:id])
     @lawsuit.comments.build
+    @lawsuit.provisions.build
   end
 
   def update
@@ -75,6 +77,11 @@ class LawsuitsController < ApplicationController
     params.require(:lawsuit).permit(:title, :category, :status, :description, :context_type, :plaintiff, :lawsuit_claim, :lawsuit_number, :court,
                                     :lawsuit_amount_claim, :lawsuit_risk, :provision, :lawsuit_state, :lawsuit_development_procedure, :civil_lawsuit,
                                     :institution, :lawsuit_phase_procedure,
-                                    comments_attributes: [ :id, :content, :user_id ], pdf_files: [])
+                                    comments_attributes: [ :id, :content, :user_id ],
+                                    provisions_attributes: [ :id, :provision_value, :provision_year ])
+          .tap do |whitelisted|
+      whitelisted[:provisions_attributes]&.reject! { |_, p| p[:provision_value].blank? || p[:provision_year].blank? }
+    end
   end
+
 end

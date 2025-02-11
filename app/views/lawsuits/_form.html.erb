@@ -85,7 +85,7 @@
           <div>
             <% if form.object.category == "lendet_penale"%>
               <%= form.label :lawsuit_phase_procedure, 'Faza e Kallëzimit Penal', class: 'block text-gray-600 font-semibold' %>
-            <% elsif form.object.category == "lendet_administrative_inspektoriat"  || form.object.category == "lendet_administrative_inspektoriat"%>
+            <% elsif form.object.category == "lendet_administrative_inspektoriat"  || form.object.category == "lendet_administrative"%>
               <%= form.label :lawsuit_phase_procedure, 'Faza e Procedurës', class: 'block text-gray-600 font-semibold' %>
             <% else %>
               <%= form.label :lawsuit_phase_procedure, 'Zhvillimi i Procedurës', class: 'block text-gray-600 font-semibold' %>
@@ -168,20 +168,47 @@
         </div>
       </div>
       <div class="mt-8">
-    <h2 class="text-2xl font-bold text-gray-800 mb-4">Shto Komentin</h2>
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Provizionimi</h2>
+        <%= form.fields_for :provisions do |provision| %>
+              <div class="space-y-4">
+                <div class="flex gap-4">
+                  <!-- Dispozita -->
+                  <div class="flex-1">
+                    <%= provision.label :provision_value,
+                                        provision.object.persisted? ? "Dispozita #{form.object.provisions.index(provision.object) + 1}" : "Dispozitë e re",
+                                        class: 'block text-gray-600 font-semibold' %>
+                    <div class="mt-1 flex rounded border border-gray-300">
+                      <span class="inline-flex items-center px-3 text-gray-500 bg-gray-100 border-r border-gray-300 rounded-l-lg">
+                      €
+                      </span>
+                      <%= provision.number_field :provision_value, step: 0.01, class: 'pl-7 pr-2 block w-full p-2 border border-gray-300 rounded', disabled: current_user.operator? && provision.object.id.present? %>
+                    </div>
 
-    <%= form.fields_for :comments do |comment| %>
-      <div class="space-y-4">
-        <div>
-          <%= comment.hidden_field :user_id, value: current_user.id %>
-          <%= comment.label :content,
-                            comment.object.persisted? ? "Komenti #{form.object.comments.index(comment.object) + 1}" : "Koment i ri",
-                            class: 'block text-gray-600 font-semibold' %>
-          <%= comment.text_area :content, rows: 3, class: 'mt-1 block w-full p-2 border border-gray-300 rounded', disabled: comment.object.id.present? %>
-        </div>
+
+                  </div>
+
+                  <div class="flex-1">
+                    <%= provision.label :provision_year, "Viti", class: 'block text-gray-600 font-semibold' %>
+                    <%= provision.select :provision_year, (2010..Time.current.year).to_a, { include_blank: true }, class: 'mt-1 block w-full p-2 border border-gray-300 rounded', disabled: current_user.operator? && provision.object.id.present? %>
+                  </div>
+                </div>
+              </div>
+          <%= "Provision ID: #{provision.object.id}" %>
+          <%= provision.hidden_field :id %>
+        <% end %>
+        <h2 class="text-2xl font-bold text-gray-800 mb-4 mt-4">Shto Komentin</h2>
+        <%= form.fields_for :comments do |comment| %>
+          <div class="space-y-4">
+            <div>
+              <%= comment.hidden_field :user_id, value: current_user.id %>
+              <%= comment.label :content,
+                                comment.object.persisted? ? "Komenti #{form.object.comments.index(comment.object) + 1}" : "Koment i ri",
+                                class: 'block text-gray-600 font-semibold' %>
+              <%= comment.text_area :content, rows: 3, class: 'mt-1 block w-full p-2 border border-gray-300 rounded', disabled: comment.object.id.present? %>
+            </div>
+          </div>
+        <% end %>
       </div>
-    <% end %>
-  </div>
 
       <div class="flex justify-center space-x-4 mt-6">
         <% if @lawsuit.new_record? %>

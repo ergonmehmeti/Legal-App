@@ -26,6 +26,18 @@
     <% end %>
   </ul>
 
+  <ul class="flex flex-col text-gray-50">
+    <li class="flex items-center">
+      <%= link_to provisions_path, class: "flex items-center px-4 py-2 font-bold text-gray-50 rounded hover:bg-gray-700 transition" do %>
+        <i class="fas fa-euro-sign  mr-2"></i> <!-- Euro Icon -->
+        <span class="md:inline-block">Provizionimet</span>
+      <% end %>
+    </li>
+  </ul>
+
+
+
+
   <!-- User Information and Logout at the Bottom -->
   <% if user_signed_in? %>
     <div class="mt-auto p-2 bg-gray-400 rounded-lg">

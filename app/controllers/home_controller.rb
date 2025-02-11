@@ -7,7 +7,7 @@ class HomeController < ApplicationController
         data: Lawsuit.where(category: category)
                      .group(:status)
                      .count
-                     .transform_keys { |key| Lawsuit.new(status: key).status_value },
+                     .transform_keys { |key| Lawsuit.new(status: key).enum_value(:status) },
         value: category
 
       }

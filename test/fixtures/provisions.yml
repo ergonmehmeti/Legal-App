@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  lawsuit: one
+  provision_value: 9.99
+  provision_year: 1
+
+two:
+  lawsuit: two
+  provision_value: 9.99
+  provision_year: 1

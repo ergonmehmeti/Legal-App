@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_01_17_095220) do
+ActiveRecord::Schema[7.2].define(version: 2025_01_29_130515) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -71,6 +71,15 @@ ActiveRecord::Schema[7.2].define(version: 2025_01_17_095220) do
     t.string "lawsuit_development_procedure"
   end
 
+  create_table "provisions", force: :cascade do |t|
+    t.integer "lawsuit_id", null: false
+    t.decimal "provision_value"
+    t.integer "provision_year"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["lawsuit_id"], name: "index_provisions_on_lawsuit_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -91,4 +100,5 @@ ActiveRecord::Schema[7.2].define(version: 2025_01_17_095220) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "comments", "lawsuits"
   add_foreign_key "comments", "users"
+  add_foreign_key "provisions", "lawsuits"
 end
