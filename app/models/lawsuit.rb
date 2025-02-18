@@ -4,7 +4,7 @@ class Lawsuit < ApplicationRecord
   accepts_nested_attributes_for :comments, reject_if: proc { |attributes| attributes['id'].present? }
   has_many_attached :pdf_files, dependent: :destroy
   has_many :provisions, dependent: :destroy
-  accepts_nested_attributes_for :provisions, reject_if: proc { |attributes| attributes['id'].present? }
+  accepts_nested_attributes_for :provisions #, reject_if: proc { |attributes| attributes['id'].present? }
 
 
 
@@ -172,7 +172,7 @@ class Lawsuit < ApplicationRecord
   end
 
   def reject_empty_provisions
-    # Only keep provisions where at least one of provision_value or provision_year is not blank
+    # Only keep services where at least one of provision_value or provision_year is not blank
     self.provisions = provisions.select { |provision| provision.provision_value.present? && provision.provision_year.present? }
   end
 

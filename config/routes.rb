@@ -21,6 +21,8 @@ Rails.application.routes.draw do
   end
   resources :comments, only: [ :create ]
   resources :provisions, only: [ :index ]
+  get 'services/export_csv', to: 'provisions#export_csv', as: 'export_csv_provisions'
+
 
   # Defines the root path route ("/")
   root "home#index"

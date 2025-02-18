@@ -41,7 +41,7 @@
   <% end %>
 
 
-  <!-- Turbo Frame for dynamically updating the lawsuit results -->
+  <!-- Turbo Frame for dynamically updating the services results -->
   <div data-turbo-frame="lawsuit-results">
     <% if @lawsuits.any? %>
       <%= render partial: 'lawsuits/lawsuits_table', locals: { lawsuits: @lawsuits, category: @category } %>

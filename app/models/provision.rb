@@ -8,7 +8,7 @@ class Provision < ApplicationRecord
     lawsuit&.enum_value(:category)  # Fetches the human-readable category from Lawsuit
   end
 
-  # Group provisions by category and year with sum of values
+  # Group services by category and year with sum of values
   def self.grouped_by_category_and_year
     provisions = includes(:lawsuit).where.not(provision_year: nil)
     grouped_data = provisions.group_by { |provision| provision.lawsuit_category }  # Now using lawsuit_category for human-readable category
@@ -24,6 +24,7 @@ class Provision < ApplicationRecord
 
       # Compute total sum for the category
       total_category_sum = provisions.sum { |provision| provision.provision_value.to_f }
+      provisions_by_year = provisions_by_year.sort_by { |year, _| -year.to_i }.to_h
 
       # Replace category data with subgroups and total sum
       grouped_data[category] = { years: provisions_by_year, total_sum: total_category_sum }
@@ -33,12 +34,14 @@ class Provision < ApplicationRecord
   end
 
   def self.grouped_by_year
-    provisions = where.not(provision_year: nil) # Get all provisions where provision_year is not nil
-    # Calculate total sum of all provisions, regardless of category
+    provisions = where.not(provision_year: nil) # Get all services where provision_year is not nil
+    # Calculate total sum of all services, regardless of category
     total_sum = provisions.sum { |provision| provision.provision_value.to_f }
-    # Group provisions by year
+    # Group services by year
     provisions_by_year = provisions.group_by { |provision| provision.provision_year }
     # Calculate sum for each year
+    provisions_by_year = provisions_by_year.sort_by { |year, _| -year.to_i }.to_h
+
     provisions_by_year.each do |year, provisions_in_year|
       sum_of_values = provisions_in_year.sum { |provision| provision.provision_value.to_f }
       provisions_by_year[year] = { provisions: provisions_in_year, sum: sum_of_values }

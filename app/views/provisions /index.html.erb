@@ -44,3 +44,26 @@
   </tbody>
 </table>
 
+<%= form_with(url: export_csv_provisions_path, method: :get, local: true, id: "year-form") do %>
+  <div class="flex items-center space-x-4 mt-4">
+    <label for="year-select" class="text-sm font-medium text-gray-700 border px-4 py-2 rounded-md shadow-sm bg-gray-100">
+      Zgjedh vitin:
+    </label>
+
+    <%= select_tag :year, options_for_select((2020..Time.current.year).to_a.reverse, selected: params[:year]),
+                   class: "rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent",
+                   id: "year-select" %>
+
+    <%= submit_tag "Eksporto Provizionimet në CSV", class: "inline-block px-6 py-2 text-sm font-medium text-white bg-gray-600 rounded-md hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50" %>
+  </div>
+<% end %>
+
+<script>
+    document.addEventListener("turbo:load", () => {
+        if (window.location.pathname === "/provisions") {
+            Turbo.session.drive = false; // Disables Turbo Drive only for the provisions index page.
+        }
+    });
+</script>
+
+<%# link_to "Eksporto Provizionimet në CSV", export_csv_provisions_path, class: "inline-block px-6 py-2 text-sm font-medium text-white bg-gray-600 rounded-md hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 mt-4" %>

@@ -66,7 +66,7 @@ class LawsuitsController < ApplicationController
       flash[:notice] = "Lawsuit was successfully deleted."
       redirect_to filtered_lawsuits_path(category: @category)
     else
-      flash[:alert] = "Failed to delete the lawsuit."
+      flash[:alert] = "Failed to delete the services."
       redirect_to show_lawsuits_path(category: @lawsuit.category, id: @lawsuit.id)
     end
   end
@@ -80,7 +80,7 @@ class LawsuitsController < ApplicationController
                                     comments_attributes: [ :id, :content, :user_id ],
                                     provisions_attributes: [ :id, :provision_value, :provision_year ])
           .tap do |whitelisted|
-      whitelisted[:provisions_attributes]&.reject! { |_, p| p[:provision_value].blank? || p[:provision_year].blank? }
+      whitelisted[:provisions_attributes]&.reject! { |_, p| (p[:provision_value].blank? || p[:provision_year].blank?) && false }
     end
   end
 

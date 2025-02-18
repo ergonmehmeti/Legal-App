@@ -71,7 +71,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_01_29_130515) do
     t.string "lawsuit_development_procedure"
   end
 
-  create_table "provisions", force: :cascade do |t|
+  create_table "services", force: :cascade do |t|
     t.integer "lawsuit_id", null: false
     t.decimal "provision_value"
     t.integer "provision_year"
@@ -100,5 +100,5 @@ ActiveRecord::Schema[7.2].define(version: 2025_01_29_130515) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "comments", "lawsuits"
   add_foreign_key "comments", "users"
-  add_foreign_key "provisions", "lawsuits"
+  add_foreign_key "services", "lawsuits"
 end
