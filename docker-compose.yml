@@ -13,7 +13,7 @@ services:
         SECRET_KEY_BASE: ${SECRET_KEY_BASE}
     container_name: legal_rails_app
     ports:
-      - "8050:3000"
+      - "80:3000"
     env_file:
       - .env
     volumes:
