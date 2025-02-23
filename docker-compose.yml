@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: legal_rails_app
+    ports:
+      - "80:3000"
+    environment:
+      RAILS_ENV: production
+    volumes:
+      - .:/app
+    networks:
+      - legal_app_network
+
+networks:
+  legal_app_network:

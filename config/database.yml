@@ -29,8 +29,9 @@ test:
 # ensure the database is located in a persisted volume.
 production:
   <<: *default
-  # database: path/to/persistent/storage/production.sqlite3
+  adapter: postgresql
   database: legal_app_production
-  username: <%= ENV["admin1"] %>
-  password: <%= ENV["Legal2024"] %>
-  host: <%= ENV["DB_PROD_HOST"] || "10.11.254.142" %>
+  username: <%= ENV["DB_USERNAME"] %>
+  password: <%= ENV["DB_PASSWORD"] %>
+  host: <%= ENV["DB_HOST"] %>
+  port: <%= ENV["DB_PORT"] %>

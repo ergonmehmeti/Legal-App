@@ -59,6 +59,9 @@ group :test do
   gem "selenium-webdriver"
 end
 
+group :production do
+  gem "pg"
+end
 
 gem "tailwindcss-rails", "~> 3.0"
 gem "devise", "~> 4.9"
