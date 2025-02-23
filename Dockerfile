@@ -8,6 +8,7 @@ ARG DB_PORT
 ARG DB_USERNAME
 ARG DB_PASSWORD
 ARG SECRET_KEY_BASE
+ARG CREATE_DATABASE
 
 # Set the environment variables
 ENV RAILS_ENV=${RAILS_ENV}
@@ -30,8 +31,13 @@ RUN bundle install --without development test --jobs 4 --retry 3
 # Copy the entire application
 COPY . .
 
-# Precompile assets and migrate the database using the RAILS_ENV environment variable
+# Precompile assets
 RUN bundle exec rake assets:precompile RAILS_ENV=$RAILS_ENV
+
+# Conditionally create the database if CREATE_DATABASE is set to true
+RUN if [ "${CREATE_DATABASE}" = "true" ]; then bundle exec rake db:create RAILS_ENV=$RAILS_ENV DB_HOST=$DB_HOST DB_PORT=$DB_PORT DB_USERNAME=$DB_USERNAME DB_PASSWORD=$DB_PASSWORD SECRET_KEY_BASE=$SECRET_KEY_BASE; fi
+
+# Migrate the database
 RUN bundle exec rake db:migrate RAILS_ENV=$RAILS_ENV DB_HOST=$DB_HOST DB_PORT=$DB_PORT DB_USERNAME=$DB_USERNAME DB_PASSWORD=$DB_PASSWORD SECRET_KEY_BASE=$SECRET_KEY_BASE
 
 # Expose port 3000 for the Rails app
