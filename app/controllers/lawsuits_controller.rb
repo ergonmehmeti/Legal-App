@@ -77,6 +77,7 @@ class LawsuitsController < ApplicationController
     params.require(:lawsuit).permit(:title, :category, :status, :description, :context_type, :plaintiff, :lawsuit_claim, :lawsuit_number, :court,
                                     :lawsuit_amount_claim, :lawsuit_risk, :provision, :lawsuit_state, :lawsuit_development_procedure, :civil_lawsuit,
                                     :institution, :lawsuit_phase_procedure,
+                                    pdf_files: [],
                                     comments_attributes: [ :id, :content, :user_id ],
                                     provisions_attributes: [ :id, :provision_value, :provision_year ])
           .tap do |whitelisted|
