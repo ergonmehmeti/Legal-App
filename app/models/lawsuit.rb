@@ -188,8 +188,8 @@ class Lawsuit < ApplicationRecord
       results = results.where(status: %w[active pending])
     end
     # Apply filters conditionally
-    results = results.where('plaintiff LIKE ?', "%#{params[:plaintiff]}%") if params[:plaintiff].present?
-    results = results.where('lawsuit_number LIKE ?', "%#{params[:lawsuit_number]}%") if params[:lawsuit_number].present?
+    results = results.where('plaintiff ILIKE ?', "%#{params[:plaintiff]}%") if params[:plaintiff].present?
+    results = results.where('lawsuit_number ILIKE ?', "%#{params[:lawsuit_number]}%") if params[:lawsuit_number].present?
     results
   end
 
