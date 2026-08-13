@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_01_29_130515) do
+ActiveRecord::Schema[7.2].define(version: 2026_08_13_120102) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -69,9 +69,15 @@ ActiveRecord::Schema[7.2].define(version: 2025_01_29_130515) do
     t.string "lawsuit_phase_procedure"
     t.string "institution"
     t.string "lawsuit_development_procedure"
+    t.datetime "discarded_at"
+    t.text "deletion_reason"
+    t.integer "deleted_by_user_id"
+    t.datetime "deleted_at"
+    t.index ["discarded_at"], name: "index_lawsuits_on_discarded_at"
+    t.index ["title", "lawsuit_number"], name: "index_lawsuits_on_title_and_number_active", unique: true, where: "discarded_at IS NULL"
   end
 
-  create_table "services", force: :cascade do |t|
+  create_table "provisions", force: :cascade do |t|
     t.integer "lawsuit_id", null: false
     t.decimal "provision_value"
     t.integer "provision_year"
@@ -96,9 +102,19 @@ ActiveRecord::Schema[7.2].define(version: 2025_01_29_130515) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "versions", force: :cascade do |t|
+    t.string "whodunnit"
+    t.datetime "created_at"
+    t.bigint "item_id", null: false
+    t.string "item_type", null: false
+    t.string "event", null: false
+    t.text "object", limit: 1073741823
+    t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "comments", "lawsuits"
   add_foreign_key "comments", "users"
-  add_foreign_key "services", "lawsuits"
+  add_foreign_key "provisions", "lawsuits"
 end

@@ -13,10 +13,15 @@ Rails.application.routes.draw do
   resources :lawsuits, only: [ :index, :new, :create, :edit, :update, :destroy ] do
     collection do
       get "new", action: :new, as: :new
+      # Specific routes MUST come before catch-all routes
+      get "deleted/(:category)", action: :deleted, as: :deleted
+      get "deleted/:category/:id", action: :show_deleted, as: :show_deleted_lawsuit
+      patch ":category/:id/restore", action: :restore, as: :restore
       get ":category/:id/edit", action: :edit, as: :edit
-      get "(:category)", action: :index, as: :filtered
-      get ":category/:id", action: :show, as: :show
       delete ":category/:id", action: :destroy, as: :destroy
+      get ":category/:id", action: :show, as: :show
+      # Catch-all route - MUST be last
+      get "(:category)", action: :index, as: :filtered
     end
   end
   resources :comments, only: [ :create ]

@@ -1,0 +1,87 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">Deleted Lawsuits (Archive)</h1>
+    <p class="text-gray-600">View and restore deleted lawsuits with all their data preserved</p>
+  </div>
+
+  <% if @category.present? %>
+    <div class="mb-4">
+      <span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
+        Category: <%= Lawsuit.categories[@category] %>
+      </span>
+    </div>
+  <% end %>
+
+  <% if @lawsuits && @lawsuits.any? %>
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plaintiff</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deleted At</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deleted By</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @lawsuits.each do |lawsuit| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                <%= lawsuit.title %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= lawsuit.category_value %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= lawsuit.plaintiff %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= lawsuit.deleted_at&.strftime('%Y-%m-%d %H:%M') %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= lawsuit.deleted_by_user&.name || 'Unknown' %>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" title="<%= lawsuit.deletion_reason %>">
+                <%= lawsuit.deletion_reason %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                <%= link_to 'View Details', 
+                            show_deleted_lawsuit_lawsuits_path(category: lawsuit.category, id: lawsuit.id),
+                            class: 'inline-block bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition' %>
+                <%= button_to 'Restore', 
+                              restore_lawsuits_path(category: lawsuit.category, id: lawsuit.id),
+                              method: :patch,
+                              data: { turbo_confirm: "Are you sure you want to restore this lawsuit?" },
+                              class: 'inline-block bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition' %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-6 flex justify-center">
+      <%= will_paginate @lawsuits, renderer: WillPaginate::ActionView::LinkRenderer,
+                        inner_window: 2,
+                        outer_window: 0,
+                        previous_label: '← Previous',
+                        next_label: 'Next →',
+                        class: 'pagination' %>
+    </div>
+  <% else %>
+    <div class="bg-gray-100 border border-gray-300 rounded-lg p-6 text-center">
+      <p class="text-gray-600 text-lg mb-2">No deleted lawsuits found.</p>
+      <p class="text-gray-500 text-sm">Deleted lawsuits will appear here with all their data preserved.</p>
+    </div>
+  <% end %>
+
+  <div class="mt-6 flex space-x-4">
+    <%= link_to 'Back to Lawsuits', filtered_lawsuits_path, 
+                class: 'bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition' %>
+    <%= link_to 'View All Deleted', deleted_lawsuits_path, 
+                class: 'bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition' %>
+  </div>
+</div>

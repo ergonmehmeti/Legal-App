@@ -16,7 +16,13 @@ class LawsuitPolicy < ApplicationPolicy
   end
 
   def destroy?
-    user.admin_developer? # Only admin_developer users can destroy
+    # Both admin and admin_developer can delete lawsuits
+    user.admin? || user.admin_developer?
+  end
+  
+  def view_deleted?
+    # Only admin_developer can view deleted lawsuits
+    user.admin_developer?
   end
 
 end
