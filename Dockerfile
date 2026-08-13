@@ -18,8 +18,12 @@ ENV DB_USERNAME=${DB_USERNAME}
 ENV DB_PASSWORD=${DB_PASSWORD}
 ENV SECRET_KEY_BASE=${SECRET_KEY_BASE}
 
+# Install CA certificates first to fix SSL verification
+RUN apk add --no-cache --allow-untrusted ca-certificates && \
+    apk update
+
 # Install required dependencies
-RUN apk add --no-cache build-base postgresql-dev nodejs yarn tzdata yaml-dev libc6-compat ca-certificates openssl
+RUN apk add --no-cache build-base postgresql-dev nodejs yarn tzdata yaml-dev libc6-compat openssl
 
 # Set the working directory
 WORKDIR /app
