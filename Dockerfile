@@ -18,8 +18,13 @@ ENV DB_USERNAME=${DB_USERNAME}
 ENV DB_PASSWORD=${DB_PASSWORD}
 ENV SECRET_KEY_BASE=${SECRET_KEY_BASE}
 
-# Install CA certificates first to fix SSL verification
-RUN apk add --no-cache --allow-untrusted ca-certificates && \
+# Fix SSL certificate issue by temporarily using HTTP repositories
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/v3.21/main" > /etc/apk/repositories && \
+    echo "http://dl-cdn.alpinelinux.org/alpine/v3.21/community" >> /etc/apk/repositories && \
+    apk update && \
+    apk add --no-cache ca-certificates && \
+    echo "https://dl-cdn.alpinelinux.org/alpine/v3.21/main" > /etc/apk/repositories && \
+    echo "https://dl-cdn.alpinelinux.org/alpine/v3.21/community" >> /etc/apk/repositories && \
     apk update
 
 # Install required dependencies
