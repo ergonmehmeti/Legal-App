@@ -1,0 +1,169 @@
+<div class="max-w-3xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-md border-4 border-red-200">
+  <!-- Deleted Lawsuit Banner -->
+  <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+    <div class="flex items-center">
+      <i class="fas fa-archive text-2xl mr-3"></i>
+      <div class="flex-1">
+        <p class="font-bold text-lg">DELETED LAWSUIT (ARCHIVED)</p>
+        <p class="text-sm">This lawsuit has been deleted but all data is preserved</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deletion Information -->
+  <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+    <h3 class="text-lg font-bold text-gray-800 mb-3">Deletion Information</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <p class="text-sm text-gray-600">Deleted By:</p>
+        <p class="font-semibold text-gray-800"><%= @lawsuit.deleted_by_user&.name || 'Unknown' %> <%= @lawsuit.deleted_by_user&.surname %></p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-600">Deleted At:</p>
+        <p class="font-semibold text-gray-800"><%= @lawsuit.deleted_at&.strftime('%Y-%m-%d %H:%M') %></p>
+      </div>
+    </div>
+    <div class="mt-4">
+      <p class="text-sm text-gray-600">Deletion Reason:</p>
+      <p class="font-semibold text-gray-800"><%= @lawsuit.deletion_reason %></p>
+    </div>
+  </div>
+
+  <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center"><%= @lawsuit.title %></h1>
+
+  <div class="space-y-4">
+    <% if @lawsuit.category == "kontestet_punes"  %>
+      <%= render 'lawsuits/categories/kontestet_punes_form' %>
+    <% elsif @lawsuit.category == "kontestet_palet_treta_tk_padites" || @lawsuit.category == "kontestet_palet_treta_tk_paditur" %>
+      <%= render 'lawsuits/categories/kontestet_palet_treta_form' %>
+    <% elsif @lawsuit.category == "lendet_penale" %>
+      <%= render 'lawsuits/categories/lendet_penale_form' %>
+    <% elsif @lawsuit.category == "lendet_administrative" || @lawsuit.category == "lendet_administrative_inspektoriat" %>
+      <%= render 'lawsuits/categories/lendet_administrative_form' %>
+    <% elsif @lawsuit.category == "lendet_arbitrazhit" %>
+      <%= render 'lawsuits/categories/lendet_arbitrazhit_form' %>
+    <% else %>
+      <%= render 'lawsuits/categories/lendet_permbarimore_form' %>
+    <% end %>
+
+    <div class="border rounded-lg p-4 bg-gray-50">
+      <strong class="text-gray-600">Natyra e Kontekstit:</strong>
+      <p class="text-gray-800"><%= @lawsuit.context_type.present? ? @lawsuit.context_type : 'N/A' %></p>
+    </div>
+
+    <div class="border rounded-lg p-4 bg-gray-50">
+      <strong class="text-gray-600">Pershkrimi:</strong>
+      <p class="text-gray-800"><%= @lawsuit.description.present? ? @lawsuit.description : 'N/A' %></p>
+    </div>
+    
+    <!-- Archived Documents Section -->
+    <% if @lawsuit.pdf_files.attached? %>
+      <div class="border-2 border-green-300 rounded-lg p-4 bg-green-50 mt-4">
+        <div class="flex items-center mb-3">
+          <i class="fas fa-check-circle text-green-600 text-xl mr-2"></i>
+          <strong class="text-gray-700 text-lg">Archived Documents (Preserved)</strong>
+        </div>
+        <p class="text-sm text-gray-600 mb-3">All documents have been preserved and are still accessible</p>
+        <ul class="mt-2 space-y-2">
+          <% @lawsuit.pdf_files.order(created_at: :desc).each do |pdf| %>
+            <li class="flex items-center bg-white p-2 rounded">
+              <i class="fas fa-file-pdf text-red-500 mr-2"></i>
+              <%= link_to pdf.filename.to_s, rails_blob_path(pdf, disposition: "inline"), target: "_blank", class: "text-blue-600 hover:underline mr-2 flex-1" %>
+              <span class="text-xs text-gray-500 mr-2"><%= number_to_human_size(pdf.byte_size) %></span>
+              <%= link_to rails_blob_path(pdf, disposition: "attachment"), download: pdf.filename.to_s, class: "text-gray-500 hover:text-gray-700" do %>
+                <i class="fas fa-download ml-2"></i>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+        <p class="text-xs text-green-700 mt-3">
+          <i class="fas fa-info-circle"></i> Total: <%= @lawsuit.pdf_files.count %> document(s) archived
+        </p>
+      </div>
+    <% else %>
+      <div class="border rounded-lg p-4 bg-gray-50 mt-4">
+        <strong class="text-gray-600">Documents:</strong>
+        <p class="text-gray-500 text-sm mt-2">No documents were attached to this lawsuit</p>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Provisions Section -->
+  <div class="mt-6">
+    <h3 class="text-2xl font-bold text-gray-800 border-b pb-2 mb-4">
+      <i class="fas fa-euro-sign text-gray-600 mr-2"></i>
+      Provizionimet
+    </h3>
+    <% if @lawsuit.provisions.any? %>
+      <div class="space-y-4">
+        <% @lawsuit.provisions.order(provision_year: :desc).each do |provision| %>
+          <div class="border border-gray-300 rounded-xl p-6 bg-gray-50 shadow hover:shadow-lg transition-shadow duration-300">
+            <p class="text-lg text-gray-700 font-semibold">
+              <span class="text-gray-900">Vlera e Provizionimit:</span>
+              <span class="text-green-600"><%= number_to_currency(provision.provision_value, unit: "€") %></span>
+            </p>
+            <p class="text-md text-gray-600 mt-2">
+              <span class="text-gray-900">Viti i Provizionimit:</span>
+              <%= provision.provision_year %>
+            </p>
+          </div>
+        <% end %>
+      </div>
+      <p class="text-xs text-gray-600 mt-3">
+        <i class="fas fa-info-circle"></i> Total: <%= @lawsuit.provisions.count %> provision(s) preserved
+      </p>
+    <% else %>
+      <p class="text-gray-500 text-sm">No provisions recorded for this lawsuit</p>
+    <% end %>
+  </div>
+
+  <!-- Comments Section -->
+  <div class="mt-8">
+    <h3 class="text-2xl font-bold text-gray-800 border-b pb-2 mb-4">
+      <i class="fas fa-comments text-gray-600 mr-2"></i>
+      Komentet
+    </h3>
+    <% if @lawsuit.comments.any? %>
+      <div class="space-y-4">
+        <% @lawsuit.comments.order(created_at: :desc).each do |comment| %>
+          <div class="border border-gray-300 rounded-xl p-6 bg-gray-50 shadow hover:shadow-lg transition-shadow duration-300">
+            <p class="text-gray-800 text-lg">
+              <%= comment.content %>
+            </p>
+            <div class="mt-3 text-sm text-gray-500 flex justify-between items-center">
+              <span class="font-medium">
+                <i class="fas fa-user text-gray-400 mr-1"></i>
+                <%= "#{comment.user.name} #{comment.user.surname} (ID: #{comment.user.kt_id})" %>
+              </span>
+              <span class="text-gray-400">
+                <i class="fas fa-calendar-alt mr-1"></i>
+                <%= comment.created_at.strftime('%d.%m.%Y') %>
+              </span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      <p class="text-xs text-gray-600 mt-3">
+        <i class="fas fa-info-circle"></i> Total: <%= @lawsuit.comments.count %> comment(s) preserved
+      </p>
+    <% else %>
+      <p class="text-gray-500 text-sm">No comments recorded for this lawsuit</p>
+    <% end %>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="flex justify-center space-x-4 mt-8 pt-6 border-t">
+    <%= link_to deleted_lawsuits_path(category: @lawsuit.category), class: 'bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition flex items-center' do %>
+      <i class="fas fa-arrow-left mr-2"></i>
+      Back to Deleted List
+    <% end %>
+    
+    <%= button_to restore_lawsuits_path(category: @lawsuit.category, id: @lawsuit.id),
+                  method: :patch,
+                  data: { turbo_confirm: "Are you sure you want to restore this lawsuit? It will become active again." },
+                  class: 'bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition flex items-center' do %>
+      <i class="fas fa-undo mr-2"></i>
+      Restore Lawsuit
+    <% end %>
+  </div>
+</div>

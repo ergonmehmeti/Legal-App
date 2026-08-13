@@ -1,13 +1,26 @@
 class Lawsuit < ApplicationRecord
+  include Discard::Model
+  has_paper_trail
 
   has_many :comments, dependent: :destroy
   accepts_nested_attributes_for :comments, reject_if: proc { |attributes| attributes['id'].present? }
-  has_many_attached :pdf_files, dependent: :destroy
+  
+  # Keep PDF files for archival - don't auto-destroy
+  has_many_attached :pdf_files
+  
   has_many :provisions, dependent: :destroy
   accepts_nested_attributes_for :provisions #, reject_if: proc { |attributes| attributes['id'].present? }
+  
+  belongs_to :deleted_by_user, class_name: 'User', optional: true
 
+  # Validations: Prevent duplicate lawsuit numbers among active (non-deleted) lawsuits
+  # This allows recreating a lawsuit with the same number after deletion
+  validates :lawsuit_number, uniqueness: { 
+    conditions: -> { kept },  # Only check among non-deleted lawsuits
+    message: "already exists for an active lawsuit"
+  }, allow_blank: true
 
-
+  validates :title, presence: true
 
   enum category: {
     kontestet_punes: "Kontestet e Punës",
@@ -106,6 +119,7 @@ class Lawsuit < ApplicationRecord
   # institution = Institucioni
   # lawsuit_development_procedure = "E shtuar kot, sa me qene aty"
 
+  # Scopes
   scope :active, -> { where(status: :active) }
   scope :pending, -> { where(status: :pending) }
 
@@ -177,7 +191,7 @@ class Lawsuit < ApplicationRecord
   end
 
   def self.important_lawsuits(category)
-    lawsuits = where(category: category, status: [:active, :pending])
+    lawsuits = kept.where(category: category, status: [:active, :pending])
     
     # Sort numeric titles numerically, non-numeric titles at the end alphabetically
     if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
@@ -188,8 +202,8 @@ class Lawsuit < ApplicationRecord
     end
   end
   def self.filter_by_params(category, params)
-    # Start with all records
-    results = where(category: category)
+    # Start with kept (non-deleted) records
+    results = kept.where(category: category)
     if params[:status].present?
       results = results.where(status: params[:status]) if params[:status].present?
     else

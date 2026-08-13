@@ -34,6 +34,10 @@ gem "pundit"
 gem "will_paginate"
 gem "chartkick"
 
+# Audit trail and soft delete
+gem "paper_trail"
+gem "discard", "~> 1.3"
+
 
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
