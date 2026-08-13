@@ -19,7 +19,7 @@ ENV DB_PASSWORD=${DB_PASSWORD}
 ENV SECRET_KEY_BASE=${SECRET_KEY_BASE}
 
 # Install required dependencies
-RUN apk add --no-cache build-base postgresql-dev nodejs yarn tzdata yaml-dev libc6-compat
+RUN apk add --no-cache build-base postgresql-dev nodejs yarn tzdata yaml-dev libc6-compat ca-certificates openssl
 
 # Set the working directory
 WORKDIR /app
