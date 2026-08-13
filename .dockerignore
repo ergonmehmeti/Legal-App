@@ -46,3 +46,7 @@
 # Ignore Docker-related files
 /.dockerignore
 /Dockerfile*
+
+# Ignore development helper scripts (security risk)
+/reset_password.sh
+/setup.sh
