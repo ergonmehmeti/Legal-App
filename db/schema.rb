@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_08_13_090933) do
+ActiveRecord::Schema[7.2].define(version: 2026_08_13_120102) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -74,6 +74,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_08_13_090933) do
     t.integer "deleted_by_user_id"
     t.datetime "deleted_at"
     t.index ["discarded_at"], name: "index_lawsuits_on_discarded_at"
+    t.index ["title", "lawsuit_number"], name: "index_lawsuits_on_title_and_number_active", unique: true, where: "discarded_at IS NULL"
   end
 
   create_table "provisions", force: :cascade do |t|

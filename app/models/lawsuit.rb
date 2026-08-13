@@ -13,14 +13,15 @@ class Lawsuit < ApplicationRecord
   
   belongs_to :deleted_by_user, class_name: 'User', optional: true
 
-  # Validations: Prevent duplicate lawsuit numbers among active (non-deleted) lawsuits
-  # This allows recreating a lawsuit with the same number after deletion
-  validates :lawsuit_number, uniqueness: { 
+  # Validations: Prevent duplicate title + lawsuit_number combination among active lawsuits
+  # Lawsuit_number alone can repeat (same case number in different categories)
+  # Title alone can repeat (different cases with same title)
+  # But the COMBINATION of title + lawsuit_number must be unique
+  validates :title, presence: true, uniqueness: { 
+    scope: :lawsuit_number,
     conditions: -> { kept },  # Only check among non-deleted lawsuits
-    message: "already exists for an active lawsuit"
-  }, allow_blank: true
-
-  validates :title, presence: true
+    message: "and lawsuit number combination already exists for an active lawsuit"
+  }
 
   enum category: {
     kontestet_punes: "Kontestet e Punës",
