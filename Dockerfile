@@ -18,24 +18,22 @@ ENV DB_USERNAME=${DB_USERNAME}
 ENV DB_PASSWORD=${DB_PASSWORD}
 ENV SECRET_KEY_BASE=${SECRET_KEY_BASE}
 
-# Fix SSL certificate issue by temporarily using HTTP repositories
-RUN echo "http://dl-cdn.alpinelinux.org/alpine/v3.21/main" > /etc/apk/repositories && \
-    echo "http://dl-cdn.alpinelinux.org/alpine/v3.21/community" >> /etc/apk/repositories && \
-    apk update && \
-    apk add --no-cache ca-certificates && \
-    echo "https://dl-cdn.alpinelinux.org/alpine/v3.21/main" > /etc/apk/repositories && \
-    echo "https://dl-cdn.alpinelinux.org/alpine/v3.21/community" >> /etc/apk/repositories && \
-    apk update
-
-# Install required dependencies
-RUN apk add --no-cache build-base postgresql-dev nodejs yarn tzdata yaml-dev libc6-compat openssl
+# Install dependencies using HTTP Alpine repos, then refresh certificate store
+RUN set -eux; \
+    echo "http://dl-cdn.alpinelinux.org/alpine/v3.21/main" > /etc/apk/repositories; \
+    echo "http://dl-cdn.alpinelinux.org/alpine/v3.21/community" >> /etc/apk/repositories; \
+    apk update; \
+    apk add --no-cache ca-certificates openssl build-base postgresql-dev nodejs yarn tzdata yaml-dev libc6-compat; \
+    update-ca-certificates
 
 # Set the working directory
 WORKDIR /app
 
 # Copy Gemfile and install gems
 COPY Gemfile Gemfile.lock ./
-RUN bundle install --without development test --jobs 4 --retry 3
+RUN sed -i 's|https://rubygems.org|http://rubygems.org|g' Gemfile Gemfile.lock && \
+    bundle config set without 'development test' && \
+    bundle install --jobs 4 --retry 3
 
 # Copy the entire application
 COPY . .
