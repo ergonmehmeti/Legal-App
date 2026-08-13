@@ -177,7 +177,15 @@ class Lawsuit < ApplicationRecord
   end
 
   def self.important_lawsuits(category)
-    where(category: category, status: [:active, :pending]).order(created_at: :desc)
+    lawsuits = where(category: category, status: [:active, :pending])
+    
+    # Sort numeric titles numerically, non-numeric titles at the end alphabetically
+    if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
+      lawsuits.order(Arel.sql("CASE WHEN title ~ '^[0-9]+$' THEN CAST(title AS INTEGER) ELSE 999999 END ASC, title ASC"))
+    else
+      # SQLite: safer approach - sort by length first (assumes numeric), then by value
+      lawsuits.order(Arel.sql("LENGTH(title) ASC, title ASC"))
+    end
   end
   def self.filter_by_params(category, params)
     # Start with all records
@@ -190,7 +198,14 @@ class Lawsuit < ApplicationRecord
     # Apply filters conditionally
     results = results.where('plaintiff ILIKE ?', "%#{params[:plaintiff]}%") if params[:plaintiff].present?
     results = results.where('lawsuit_number ILIKE ?', "%#{params[:lawsuit_number]}%") if params[:lawsuit_number].present?
-    results
+    
+    # Sort numeric titles numerically, non-numeric titles at the end alphabetically
+    if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
+      results.order(Arel.sql("CASE WHEN title ~ '^[0-9]+$' THEN CAST(title AS INTEGER) ELSE 999999 END ASC, title ASC"))
+    else
+      # SQLite: safer approach - sort by length first (assumes numeric), then by value
+      results.order(Arel.sql("LENGTH(title) ASC, title ASC"))
+    end
   end
 
 end
