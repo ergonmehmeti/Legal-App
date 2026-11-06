@@ -29,6 +29,13 @@
   <ul class="flex flex-col text-gray-50">
     <% if current_user.admin_developer? %>
       <li class="flex items-center">
+        <% admin_active = controller_path.start_with?('admin/') ? 'bg-gray-700' : '' %>
+        <%= link_to admin_root_path, class: "flex items-center px-4 py-2 font-bold text-gray-50 rounded hover:bg-gray-700 transition #{admin_active}" do %>
+          <i class="fas fa-user-shield mr-2"></i> <!-- Admin Icon -->
+          <span class="md:inline-block">Admin</span>
+        <% end %>
+      </li>
+      <li class="flex items-center">
         <%= link_to deleted_lawsuits_path, class: "flex items-center px-4 py-2 font-bold text-gray-50 rounded hover:bg-gray-700 transition" do %>
           <i class="fas fa-archive mr-2"></i> <!-- Archive Icon -->
           <span class="md:inline-block">Deleted Lawsuits</span>

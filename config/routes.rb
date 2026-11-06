@@ -24,6 +24,11 @@ Rails.application.routes.draw do
       get "(:category)", action: :index, as: :filtered
     end
   end
+  # Admin area (admin_developer only, enforced in Admin::BaseController)
+  namespace :admin do
+    root "dashboard#index"
+  end
+
   resources :comments, only: [ :create ]
   resources :provisions, only: [ :index ]
   get 'services/export_csv', to: 'provisions#export_csv', as: 'export_csv_provisions'
