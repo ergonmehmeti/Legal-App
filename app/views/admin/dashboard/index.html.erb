@@ -19,6 +19,8 @@
           <li><%= role.titleize %>: <strong><%= @users_by_role[role].to_i %></strong></li>
         <% end %>
       </ul>
+      <%= link_to "Menaxho Përdoruesit", admin_users_path,
+                  class: "inline-block mt-4 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition" %>
     </div>
 
     <!-- Deleted lawsuits card -->

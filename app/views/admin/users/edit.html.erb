@@ -1,0 +1,10 @@
+<% content_for :title, "Ndrysho Përdoruesin" %>
+
+<div class="w-full">
+  <div class="max-w-3xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+      Ndrysho: <%= "#{@user.name_was} #{@user.surname_was}" %>
+    </h1>
+    <%= render 'form', user: @user %>
+  </div>
+</div>
