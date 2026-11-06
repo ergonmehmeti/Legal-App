@@ -10,6 +10,10 @@ Rails.application.routes.draw do
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
+  # PDFs of a lawsuit: delete = hide (soft delete), restore = admin_developer only
+  delete "lawsuits/:lawsuit_id/pdf_files/:id", to: "lawsuit_pdf_files#destroy", as: :lawsuit_pdf_file
+  patch "lawsuits/:lawsuit_id/pdf_files/:id/restore", to: "lawsuit_pdf_files#restore", as: :restore_lawsuit_pdf_file
+
   resources :lawsuits, only: [ :index, :new, :create, :edit, :update, :destroy ] do
     collection do
       get "new", action: :new, as: :new
