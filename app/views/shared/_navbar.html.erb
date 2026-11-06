@@ -60,6 +60,9 @@
       <span class="block font-bold text-purple-900 mb-1 text-sm">
         <%= "#{current_user.name.titleize} #{current_user.surname.titleize}" %>
       </span>
+      <%= link_to edit_profile_path, class: "flex items-center text-xs text-purple-900 hover:underline mb-2" do %>
+        <i class="fas fa-key mr-1"></i> Ndrysho Fjalëkalimin
+      <% end %>
       <%= link_to "Logout", destroy_user_session_path,
                   data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to Logout?", turbolinks: false },
                   class: "block text-center rounded-lg py-1 px-2 bg-red-400 font-bold text-purple-900 hover:bg-red-700 transition text-sm" %>
