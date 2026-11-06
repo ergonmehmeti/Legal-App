@@ -140,11 +140,13 @@
           <%= form.text_area :description, rows: 5, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
         </div>
         <!-- Display Existing PDF Files -->
-        <% if @lawsuit.pdf_files.attached? %>
+        <%# Only list saved PDFs: unsaved uploads (after a failed validation) have no URL yet %>
+        <% saved_pdfs = @lawsuit.pdf_files.select(&:persisted?) %>
+        <% if saved_pdfs.any? %>
           <div class="border rounded-lg p-4 bg-gray-50 mt-4">
             <strong class="text-gray-600">Dokumentet Egzistuese:</strong>
             <ul class="mt-2 space-y-2">
-              <% @lawsuit.pdf_files.each do |pdf| %>
+              <% saved_pdfs.each do |pdf| %>
                 <li>
                   <%= link_to pdf.filename.to_s, rails_blob_path(pdf, disposition: "inline"), target: "_blank", class: "text-blue-600 hover:underline" %>
                 </li>
