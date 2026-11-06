@@ -14,6 +14,11 @@
         <h2 class="text-xl font-bold text-gray-800">Përdoruesit</h2>
       </div>
       <p class="text-4xl font-bold text-gray-800 mb-2"><%= @users_count %></p>
+      <p class="text-sm mb-3">
+        <span class="text-green-700 font-semibold">Aktiv: <%= @users_count - @inactive_users_count %></span>
+        <span class="text-gray-400 mx-1">·</span>
+        <span class="text-red-700 font-semibold">Joaktiv: <%= @inactive_users_count %></span>
+      </p>
       <ul class="text-sm text-gray-600 space-y-1">
         <% User.roles.each_key do |role| %>
           <li><%= role.titleize %>: <strong><%= @users_by_role[role].to_i %></strong></li>
