@@ -94,7 +94,9 @@
 
 
   <div class="flex justify-center space-x-4 mt-6">
-    <%= link_to 'Ndrysho', edit_lawsuits_path(category: @lawsuit.category, id: @lawsuit.id), class: 'bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition' %>
+    <% if policy(@lawsuit).update? %>
+      <%= link_to 'Ndrysho', edit_lawsuits_path(category: @lawsuit.category, id: @lawsuit.id), class: 'bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition' %>
+    <% end %>
     <%= link_to 'Kthehu Prapa', filtered_lawsuits_path(category: @lawsuit.category), class: 'bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition' %>
     <% if current_user.admin? || current_user.admin_developer? %>
       <button type="button" 

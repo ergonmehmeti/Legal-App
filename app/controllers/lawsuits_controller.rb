@@ -44,6 +44,8 @@ class LawsuitsController < ApplicationController
     # Archived (deleted) lawsuits cannot be edited, not even by typing the URL
     @lawsuit = Lawsuit.kept.find_by(id: params[:id])
     return redirect_archived_lawsuit unless @lawsuit
+    # Only roles that can save changes may open the edit page (same rule as update)
+    authorize @lawsuit, :update?
 
     @lawsuit.comments.build
     @lawsuit.provisions.build
