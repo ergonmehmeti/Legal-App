@@ -39,3 +39,4 @@ en:
         role: "Roli"
         password: "Fjalëkalimi"
         password_confirmation: "Konfirmimi i fjalëkalimit"
+        current_password: "Fjalëkalimi aktual"

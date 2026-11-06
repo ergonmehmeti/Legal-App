@@ -34,6 +34,9 @@ Rails.application.routes.draw do
     end
   end
 
+  # Change own password (any logged-in user)
+  resource :profile, only: %i[edit update]
+
   resources :comments, only: [ :create ]
   resources :provisions, only: [ :index ]
   get 'services/export_csv', to: 'provisions#export_csv', as: 'export_csv_provisions'
