@@ -47,6 +47,20 @@ module Admin
       end
     end
 
+    def toggle_active
+      @user = User.find(params[:id])
+      if @user.id == current_user.id
+        return redirect_to admin_users_path, alert: "Nuk mund ta çaktivizoni llogarinë tuaj."
+      end
+      authorize @user
+
+      # update_attribute: skips validations but keeps callbacks,
+      # so PaperTrail records who (de)activated the user
+      @user.update_attribute(:active, !@user.active?)
+      status = @user.active? ? "u aktivizua" : "u çaktivizua"
+      redirect_to admin_users_path, notice: "Përdoruesi #{@user.name} #{@user.surname} #{status}."
+    end
+
     private
 
     def set_user

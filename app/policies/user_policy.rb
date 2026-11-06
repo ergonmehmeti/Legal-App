@@ -11,4 +11,9 @@ class UserPolicy < ApplicationPolicy
   def update?
     user.admin_developer?
   end
+
+  # Activate / deactivate. Never your own account (no lockout).
+  def toggle_active?
+    user.admin_developer? && record.id != user.id
+  end
 end

@@ -27,7 +27,11 @@ Rails.application.routes.draw do
   # Admin area (admin_developer only, enforced in Admin::BaseController)
   namespace :admin do
     root "dashboard#index"
-    resources :users, only: %i[index new create edit update]
+    resources :users, only: %i[index new create edit update] do
+      member do
+        patch :toggle_active
+      end
+    end
   end
 
   resources :comments, only: [ :create ]

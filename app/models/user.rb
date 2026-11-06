@@ -20,4 +20,17 @@ class User < ApplicationRecord
   # validate: true -> role is required and must be one of these (no "no role" users)
   enum :role, { admin_developer: 0, admin: 1, operator: 2 }, validate: true
 
+  # Deactivation: users are never deleted (comments / audit history stay linked)
+  scope :active_users, -> { where(active: true) }
+  scope :inactive_users, -> { where(active: false) }
+
+  # Devise checks this on login AND on every request,
+  # so a deactivated user is logged out on their next click.
+  def active_for_authentication?
+    super && active?
+  end
+
+  def inactive_message
+    active? ? super : :deactivated
+  end
 end
