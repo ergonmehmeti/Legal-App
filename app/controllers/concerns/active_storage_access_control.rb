@@ -24,7 +24,8 @@ module ActiveStorageAccessControl
     end
   end
 
-  # Hidden ("deleted") PDFs open only for admin_developer, even from old links.
+  # Hidden ("deleted") PDFs, and all PDFs of archived (deleted) lawsuits,
+  # open only for admin_developer, even from old links.
   # Runs after ActiveStorage::SetBlob has loaded @blob.
   module BlockHiddenFiles
     extend ActiveSupport::Concern
@@ -38,7 +39,11 @@ module ActiveStorageAccessControl
     def block_hidden_files
       return if current_user&.admin_developer?
 
-      head :not_found if @blob.attachments.where(name: "deleted_pdf_files").exists?
+      attachments = @blob.attachments
+      hidden_pdf = attachments.where(name: "deleted_pdf_files")
+      archived_lawsuit_pdf = attachments.where(record_type: "Lawsuit", record_id: Lawsuit.discarded.select(:id))
+
+      head :not_found if hidden_pdf.or(archived_lawsuit_pdf).exists?
     end
   end
 end

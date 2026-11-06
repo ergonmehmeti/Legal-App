@@ -38,6 +38,10 @@ Goal: a wrongly uploaded PDF can be removed from a lawsuit **without losing it**
 - [x] `docker-compose build && docker-compose up -d` (runs the migration)
 - [x] Test as admin_developer, admin (temporary test user, rolled back) and operator; test PDF link while logged out
 
+### Step 6: Archived (deleted) lawsuits and their PDFs
+- [x] PDFs of an archived lawsuit open only for admin_developer (others get 404, even from old links)
+- [x] Archive page shows the lawsuit's hidden PDFs too (who, when, reason), read-only
+- [x] Archived lawsuits cannot be edited or saved by typing the URL (`Lawsuit.kept` in edit/update)
+
 ## Later / optional
 - Server-side PDF checks (only PDF content type, max file size)
-- Show deleted PDFs also on the archived (deleted) lawsuit page

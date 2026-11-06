@@ -86,6 +86,9 @@
         <p class="text-gray-500 text-sm mt-2">No documents were attached to this lawsuit</p>
       </div>
     <% end %>
+
+    <!-- PDFs deleted (hidden) before the lawsuit was archived: read-only here -->
+    <%= render "deleted_pdfs", allow_restore: false %>
   </div>
 
   <!-- Provisions Section -->
