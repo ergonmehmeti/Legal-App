@@ -147,8 +147,21 @@
             <strong class="text-gray-600">Dokumentet Egzistuese:</strong>
             <ul class="mt-2 space-y-2">
               <% saved_pdfs.each do |pdf| %>
-                <li>
+                <li class="flex items-center">
                   <%= link_to pdf.filename.to_s, rails_blob_path(pdf, disposition: "inline"), target: "_blank", class: "text-blue-600 hover:underline" %>
+
+                  <%# Delete (hide) PDF: whoever can edit the lawsuit. type="button" = never submits this form;
+                      the popup with its own form is rendered outside (lawsuits/_pdf_delete_modal) %>
+                  <% if @lawsuit.persisted? && policy(@lawsuit).destroy_pdf? %>
+                    <button type="button"
+                            title="Fshi dokumentin"
+                            class="ml-3 px-2 py-0.5 text-xs border border-red-400 text-red-600 rounded hover:bg-red-600 hover:text-white transition"
+                            data-url="<%= lawsuit_pdf_file_path(lawsuit_id: @lawsuit.id, id: pdf.id) %>"
+                            data-filename="<%= pdf.filename %>"
+                            onclick="showPdfDeleteModal(this)">
+                      <i class="fas fa-trash-alt"></i> Fshi
+                    </button>
+                  <% end %>
                 </li>
               <% end %>
             </ul>

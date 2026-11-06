@@ -1,0 +1,43 @@
+<!-- Delete (hide) PDF Modal: the file is kept, only admin_developer can still see it -->
+<% if policy(@lawsuit).destroy_pdf? %>
+  <div id="pdfDeleteModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" style="display: none;">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <h3 class="text-lg leading-6 font-medium text-gray-900 mb-2">Fshi Dokumentin</h3>
+      <p class="text-sm text-gray-700 mb-1 break-all"><i class="fas fa-file-pdf text-red-500 mr-1"></i><span id="pdfDeleteFilename"></span></p>
+      <p class="text-sm text-gray-500 mb-4">Dokumenti do të fshihet nga lënda.</p>
+      <%= form_with url: "#", method: :delete, local: true, id: "pdfDeleteForm", class: "space-y-4" do %>
+        <div>
+          <label for="pdf_deletion_reason" class="block text-sm font-medium text-gray-700 mb-2">
+            Arsyeja e fshirjes (e detyrueshme):
+          </label>
+          <textarea name="deletion_reason" id="pdf_deletion_reason" rows="3" required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    placeholder="P.sh. dokumenti u ngarkua gabimisht..."></textarea>
+        </div>
+        <div class="flex space-x-2 justify-end">
+          <button type="button" onclick="hidePdfDeleteModal()"
+                  class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition">Anulo</button>
+          <button type="submit"
+                  class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">Fshi</button>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <script>
+    function showPdfDeleteModal(button) {
+      document.getElementById('pdfDeleteForm').action = button.dataset.url;
+      document.getElementById('pdfDeleteFilename').textContent = button.dataset.filename;
+      const modal = document.getElementById('pdfDeleteModal');
+      modal.classList.remove('hidden');
+      modal.style.display = 'block';
+    }
+
+    function hidePdfDeleteModal() {
+      const modal = document.getElementById('pdfDeleteModal');
+      modal.classList.add('hidden');
+      modal.style.display = 'none';
+      document.getElementById('pdf_deletion_reason').value = '';
+    }
+  </script>
+<% end %>
