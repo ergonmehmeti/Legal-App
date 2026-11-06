@@ -25,4 +25,18 @@ class LawsuitPolicy < ApplicationPolicy
     user.admin_developer?
   end
 
+  # PDFs: whoever can edit the lawsuit can delete (hide) a PDF
+  def destroy_pdf?
+    update?
+  end
+
+  # Only admin_developer sees hidden PDFs (with reason) and can restore them
+  def view_deleted_pdfs?
+    user.admin_developer?
+  end
+
+  def restore_pdf?
+    user.admin_developer?
+  end
+
 end

@@ -29,6 +29,13 @@
   <ul class="flex flex-col text-gray-50">
     <% if current_user.admin_developer? %>
       <li class="flex items-center">
+        <% admin_active = controller_path.start_with?('admin/') ? 'bg-gray-700' : '' %>
+        <%= link_to admin_root_path, class: "flex items-center px-4 py-2 font-bold text-gray-50 rounded hover:bg-gray-700 transition #{admin_active}" do %>
+          <i class="fas fa-user-shield mr-2"></i> <!-- Admin Icon -->
+          <span class="md:inline-block">Admin</span>
+        <% end %>
+      </li>
+      <li class="flex items-center">
         <%= link_to deleted_lawsuits_path, class: "flex items-center px-4 py-2 font-bold text-gray-50 rounded hover:bg-gray-700 transition" do %>
           <i class="fas fa-archive mr-2"></i> <!-- Archive Icon -->
           <span class="md:inline-block">Deleted Lawsuits</span>
@@ -53,6 +60,9 @@
       <span class="block font-bold text-purple-900 mb-1 text-sm">
         <%= "#{current_user.name.titleize} #{current_user.surname.titleize}" %>
       </span>
+      <%= link_to edit_profile_path, class: "flex items-center text-xs text-purple-900 hover:underline mb-2" do %>
+        <i class="fas fa-key mr-1"></i> Ndrysho Fjalëkalimin
+      <% end %>
       <%= link_to "Logout", destroy_user_session_path,
                   data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to Logout?", turbolinks: false },
                   class: "block text-center rounded-lg py-1 px-2 bg-red-400 font-bold text-purple-900 hover:bg-red-700 transition text-sm" %>

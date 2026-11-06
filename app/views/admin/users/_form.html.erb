@@ -1,0 +1,75 @@
+<%# Shared by new + edit. Editing yourself: role is locked (no lockout). %>
+<% editing_self = user.persisted? && user.id == current_user.id %>
+
+<%= form_with model: [:admin, user], local: true do |form| %>
+  <% if user.errors.any? %>
+    <div class="bg-red-100 border border-red-400 text-red-600 p-4 rounded-lg mb-4">
+      <% user.errors.full_messages.each do |message| %>
+        <div><%= message %></div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="space-y-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <%= form.label :name, 'Emri', class: 'block text-gray-600 font-semibold' %>
+        <%= form.text_field :name, required: true, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+      </div>
+      <div>
+        <%= form.label :surname, 'Mbiemri', class: 'block text-gray-600 font-semibold' %>
+        <%= form.text_field :surname, required: true, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+      </div>
+    </div>
+
+    <div>
+      <%= form.label :email, 'Email (për kyçje)', class: 'block text-gray-600 font-semibold' %>
+      <%= form.email_field :email, required: true, autocomplete: 'off', class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <%= form.label :kt_id, 'ID e Punonjësit (KT)', class: 'block text-gray-600 font-semibold' %>
+        <%= form.number_field :kt_id, required: true, min: 1, step: 1, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+      </div>
+      <div>
+        <%= form.label :role, 'Roli', class: 'block text-gray-600 font-semibold' %>
+        <%= form.select :role,
+                        User.roles.keys.map { |r| [r.titleize, r] },
+                        {},
+                        disabled: editing_self,
+                        class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+        <% if editing_self %>
+          <p class="text-xs text-gray-500 mt-1">Nuk mund ta ndryshoni rolin tuaj.</p>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="border-t pt-4">
+      <h2 class="text-lg font-bold text-gray-800 mb-1">Fjalëkalimi</h2>
+      <p class="text-sm text-gray-500 mb-3">
+        <% if user.persisted? %>
+          Lëreni bosh për ta mbajtur fjalëkalimin aktual. Fjalëkalimi i ri: min. 8 karaktere.
+        <% else %>
+          Min. 6 karaktere. Përdoruesi mund ta ndryshojë më vonë (min. 8 karaktere).
+        <% end %>
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <%= form.label :password, 'Fjalëkalimi', class: 'block text-gray-600 font-semibold' %>
+          <%= form.password_field :password, required: !user.persisted?, autocomplete: 'new-password', class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+        </div>
+        <div>
+          <%= form.label :password_confirmation, 'Konfirmo Fjalëkalimin', class: 'block text-gray-600 font-semibold' %>
+          <%= form.password_field :password_confirmation, required: !user.persisted?, autocomplete: 'new-password', class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-center space-x-4 mt-6">
+    <%= form.submit user.persisted? ? 'Ruaj Ndryshimet' : 'Krijo Përdoruesin',
+                    class: 'bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition cursor-pointer' %>
+    <%= link_to 'Kthehu Prapa', admin_users_path, class: 'bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition' %>
+  </div>
+<% end %>

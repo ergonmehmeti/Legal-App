@@ -29,3 +29,14 @@
 
 en:
   hello: "Hello world"
+  activerecord:
+    attributes:
+      user:
+        name: "Emri"
+        surname: "Mbiemri"
+        email: "Email"
+        kt_id: "ID e Punonjësit (KT)"
+        role: "Roli"
+        password: "Fjalëkalimi"
+        password_confirmation: "Konfirmimi i fjalëkalimit"
+        current_password: "Fjalëkalimi aktual"

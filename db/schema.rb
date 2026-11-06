@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_08_13_120102) do
+ActiveRecord::Schema[7.2].define(version: 2026_11_06_140000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -77,6 +77,18 @@ ActiveRecord::Schema[7.2].define(version: 2026_08_13_120102) do
     t.index ["title", "lawsuit_number"], name: "index_lawsuits_on_title_and_number_active", unique: true, where: "discarded_at IS NULL"
   end
 
+  create_table "pdf_file_deletions", force: :cascade do |t|
+    t.integer "lawsuit_id", null: false
+    t.integer "attachment_id", null: false
+    t.integer "deleted_by_user_id", null: false
+    t.text "reason", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["attachment_id"], name: "index_pdf_file_deletions_on_attachment_id", unique: true
+    t.index ["deleted_by_user_id"], name: "index_pdf_file_deletions_on_deleted_by_user_id"
+    t.index ["lawsuit_id"], name: "index_pdf_file_deletions_on_lawsuit_id"
+  end
+
   create_table "provisions", force: :cascade do |t|
     t.integer "lawsuit_id", null: false
     t.decimal "provision_value"
@@ -98,7 +110,9 @@ ActiveRecord::Schema[7.2].define(version: 2026_08_13_120102) do
     t.string "surname"
     t.integer "kt_id"
     t.integer "role"
+    t.boolean "active", default: true, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["kt_id"], name: "index_users_on_kt_id", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
@@ -116,5 +130,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_08_13_120102) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "comments", "lawsuits"
   add_foreign_key "comments", "users"
+  add_foreign_key "pdf_file_deletions", "active_storage_attachments", column: "attachment_id"
+  add_foreign_key "pdf_file_deletions", "lawsuits"
+  add_foreign_key "pdf_file_deletions", "users", column: "deleted_by_user_id"
   add_foreign_key "provisions", "lawsuits"
 end

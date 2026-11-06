@@ -45,6 +45,9 @@
       </div>
     <% end %>
 
+    <!-- Deleted (hidden) PDFs: admin_developer only, with who/when/why + restore -->
+    <%= render "deleted_pdfs", allow_restore: true %>
+
   </div>
 
   <div class="mt-6">
@@ -67,10 +70,12 @@
 
   <!-- New Section: Comments -->
   <div class="mt-8">
-    <h3 class="text-2xl font-bold text-gray-800 border-b pb-2 mb-4">Komentet</h3>
+    <% comments = @lawsuit.comments.includes(:user).order(created_at: :desc).to_a %>
+    <h3 class="text-2xl font-bold text-gray-800 border-b pb-2 mb-4">Komentet (<%= comments.size %>)</h3>
     <div class="space-y-4">
-      <% @lawsuit.comments.order(created_at: :desc).limit(3).each do |comment| %>
-        <div class="border border-gray-300 rounded-xl p-6 bg-gray-50 shadow hover:shadow-lg transition-shadow duration-300">
+      <%# Newest 3 always visible; older ones hidden until "Shfaq më shumë" %>
+      <% comments.each_with_index do |comment, index| %>
+        <div class="<%= 'hidden js-older-comment' if index >= 3 %> border border-gray-300 rounded-xl p-6 bg-gray-50 shadow hover:shadow-lg transition-shadow duration-300">
           <p class="text-gray-800 text-lg">
             <%= comment.content %>
           </p>
@@ -87,11 +92,35 @@
         </div>
       <% end %>
     </div>
+
+    <% if comments.size > 3 %>
+      <div class="text-center mt-4">
+        <button type="button"
+                id="toggleOlderComments"
+                data-more="Shfaq më shumë (<%= comments.size - 3 %>)"
+                data-less="Shfaq më pak"
+                onclick="toggleOlderComments(this)"
+                class="px-4 py-2 border border-gray-500 text-gray-600 rounded hover:bg-gray-500 hover:text-white transition">
+          Shfaq më shumë (<%= comments.size - 3 %>)
+        </button>
+      </div>
+      <script>
+        function toggleOlderComments(button) {
+          const older = document.querySelectorAll('.js-older-comment');
+          const showing = button.dataset.showing === 'true';
+          older.forEach(el => el.classList.toggle('hidden', showing));
+          button.dataset.showing = (!showing).toString();
+          button.textContent = showing ? button.dataset.more : button.dataset.less;
+        }
+      </script>
+    <% end %>
   </div>
 
 
   <div class="flex justify-center space-x-4 mt-6">
-    <%= link_to 'Ndrysho', edit_lawsuits_path(category: @lawsuit.category, id: @lawsuit.id), class: 'bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition' %>
+    <% if policy(@lawsuit).update? %>
+      <%= link_to 'Ndrysho', edit_lawsuits_path(category: @lawsuit.category, id: @lawsuit.id), class: 'bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition' %>
+    <% end %>
     <%= link_to 'Kthehu Prapa', filtered_lawsuits_path(category: @lawsuit.category), class: 'bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition' %>
     <% if current_user.admin? || current_user.admin_developer? %>
       <button type="button" 

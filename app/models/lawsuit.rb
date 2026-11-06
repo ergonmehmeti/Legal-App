@@ -7,7 +7,10 @@ class Lawsuit < ApplicationRecord
   
   # Keep PDF files for archival - don't auto-destroy
   has_many_attached :pdf_files
-  
+  # "Deleted" PDFs: hidden from everyone except admin_developer, file stays on disk
+  has_many_attached :deleted_pdf_files
+  has_many :pdf_file_deletions, dependent: :destroy
+
   has_many :provisions, dependent: :destroy
   accepts_nested_attributes_for :provisions #, reject_if: proc { |attributes| attributes['id'].present? }
   
@@ -183,6 +186,22 @@ class Lawsuit < ApplicationRecord
       }
     else
       {}
+    end
+  end
+
+  # Hide a PDF: move it from pdf_files to deleted_pdf_files and record who/why.
+  def hide_pdf!(attachment, user:, reason:)
+    transaction do
+      pdf_file_deletions.create!(attachment: attachment, deleted_by_user: user, reason: reason)
+      attachment.update!(name: "deleted_pdf_files")
+    end
+  end
+
+  # Restore a hidden PDF back to pdf_files (PaperTrail keeps the deletion history).
+  def restore_pdf!(attachment)
+    transaction do
+      pdf_file_deletions.find_by(attachment: attachment)&.destroy!
+      attachment.update!(name: "pdf_files")
     end
   end
 

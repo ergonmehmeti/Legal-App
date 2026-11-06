@@ -41,13 +41,20 @@ class LawsuitsController < ApplicationController
   end
 
   def edit
-    @lawsuit = Lawsuit.find(params[:id])
+    # Archived (deleted) lawsuits cannot be edited, not even by typing the URL
+    @lawsuit = Lawsuit.kept.find_by(id: params[:id])
+    return redirect_archived_lawsuit unless @lawsuit
+    # Only roles that can save changes may open the edit page (same rule as update)
+    authorize @lawsuit, :update?
+
     @lawsuit.comments.build
     @lawsuit.provisions.build
   end
 
   def update
-    @lawsuit = Lawsuit.find(params[:id])
+    @lawsuit = Lawsuit.kept.find_by(id: params[:id])
+    return redirect_archived_lawsuit unless @lawsuit
+
     authorize @lawsuit
     if lawsuit_params[:pdf_files]
       @lawsuit.pdf_files.attach(lawsuit_params[:pdf_files])
@@ -142,6 +149,12 @@ class LawsuitsController < ApplicationController
 
 
   private
+
+  def redirect_archived_lawsuit
+    redirect_to filtered_lawsuits_path(category: params[:category]),
+                alert: "Kjo lëndë është fshirë dhe nuk mund të ndryshohet."
+  end
+
   def lawsuit_params
     params.require(:lawsuit).permit(:title, :category, :status, :description, :context_type, :plaintiff, :lawsuit_claim, :lawsuit_number, :court,
                                     :lawsuit_amount_claim, :lawsuit_risk, :provision, :lawsuit_state, :lawsuit_development_procedure, :civil_lawsuit,

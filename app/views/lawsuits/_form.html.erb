@@ -140,13 +140,28 @@
           <%= form.text_area :description, rows: 5, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
         </div>
         <!-- Display Existing PDF Files -->
-        <% if @lawsuit.pdf_files.attached? %>
+        <%# Only list saved PDFs: unsaved uploads (after a failed validation) have no URL yet %>
+        <% saved_pdfs = @lawsuit.pdf_files.select(&:persisted?) %>
+        <% if saved_pdfs.any? %>
           <div class="border rounded-lg p-4 bg-gray-50 mt-4">
             <strong class="text-gray-600">Dokumentet Egzistuese:</strong>
             <ul class="mt-2 space-y-2">
-              <% @lawsuit.pdf_files.each do |pdf| %>
-                <li>
+              <% saved_pdfs.each do |pdf| %>
+                <li class="flex items-center">
                   <%= link_to pdf.filename.to_s, rails_blob_path(pdf, disposition: "inline"), target: "_blank", class: "text-blue-600 hover:underline" %>
+
+                  <%# Delete (hide) PDF: whoever can edit the lawsuit. type="button" = never submits this form;
+                      the popup with its own form is rendered outside (lawsuits/_pdf_delete_modal) %>
+                  <% if @lawsuit.persisted? && policy(@lawsuit).destroy_pdf? %>
+                    <button type="button"
+                            title="Fshi dokumentin"
+                            class="ml-3 px-2 py-0.5 text-xs border border-red-400 text-red-600 rounded hover:bg-red-600 hover:text-white transition"
+                            data-url="<%= lawsuit_pdf_file_path(lawsuit_id: @lawsuit.id, id: pdf.id) %>"
+                            data-filename="<%= pdf.filename %>"
+                            onclick="showPdfDeleteModal(this)">
+                      <i class="fas fa-trash-alt"></i> Fshi
+                    </button>
+                  <% end %>
                 </li>
               <% end %>
             </ul>
