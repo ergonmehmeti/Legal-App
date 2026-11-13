@@ -105,6 +105,13 @@
           <%= form.select :status, options_for_select(Lawsuit.statuses.map { |key, value| [value, key] }, selected: (form.object.status || 'pending')), { prompt: '' }, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
         </div>
 
+        <%# Optional, all categories; the empty choice clears it %>
+        <div>
+          <%= form.label :final_status, 'Statusi Final i Lëndës', class: 'block text-gray-600 font-semibold' %>
+          <%= form.select :final_status, Lawsuit::FINAL_STATUSES.map { |key, label| [label, key] },
+                          { include_blank: '—' }, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+        </div>
+
 
 
         <% if form.object.category != "lendet_penale" %>
