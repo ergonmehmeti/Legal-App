@@ -35,12 +35,32 @@
       <div>
         <%= form.label :role, 'Roli', class: 'block text-gray-600 font-semibold' %>
         <%= form.select :role,
-                        User.roles.keys.map { |r| [r.titleize, r] },
+                        User.roles.keys.map { |r| [User.role_label(r), r] },
                         {},
                         disabled: editing_self,
                         class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
         <% if editing_self %>
           <p class="text-xs text-gray-500 mt-1">Nuk mund ta ndryshoni rolin tuaj.</p>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Category scopes: only for Përfaqësues Ligjor (shown / hidden with the role dropdown).
+        Checked = sees ALL lawsuits of that category (read only), besides the assigned ones. %>
+    <div id="category-scopes" class="border-t pt-4 <%= 'hidden' unless user.legal_representative? %>">
+      <h2 class="text-lg font-bold text-gray-800 mb-1">Qasje në kategori të plota</h2>
+      <p class="text-sm text-gray-500 mb-3">
+        Përveç lëndëve ku është caktuar, Përfaqësuesi Ligjor i sheh (vetëm për lexim) <strong>të gjitha</strong> lëndët e kategorive të zgjedhura.
+      </p>
+      <%# Empty value first: with nothing checked the browser sends nothing, this makes "none" arrive %>
+      <%= hidden_field_tag 'user[category_scopes][]', '', id: nil %>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <% Lawsuit.categories.each do |key, label| %>
+          <label class="flex items-center space-x-2 text-gray-700">
+            <%= check_box_tag 'user[category_scopes][]', key, user.category_scopes.include?(key),
+                              id: "user_category_scopes_#{key}", class: 'rounded border-gray-300' %>
+            <span><%= label %></span>
+          </label>
         <% end %>
       </div>
     </div>
@@ -66,6 +86,16 @@
       </div>
     </div>
   </div>
+
+  <script>
+    // Category scopes only make sense for Përfaqësues Ligjor (other roles see everything already)
+    (function () {
+      const role = document.getElementById('user_role');
+      const box = document.getElementById('category-scopes');
+      if (!role || !box) return;
+      role.addEventListener('change', () => box.classList.toggle('hidden', role.value !== 'legal_representative'));
+    })();
+  </script>
 
   <div class="flex justify-center space-x-4 mt-6">
     <%= form.submit user.persisted? ? 'Ruaj Ndryshimet' : 'Krijo Përdoruesin',

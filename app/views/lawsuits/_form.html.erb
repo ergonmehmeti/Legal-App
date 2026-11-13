@@ -28,13 +28,14 @@
             <%= form.text_field :lawsuit_claim, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
             </div>
         <% elsif form.object.category == "lendet_permbarimore_kreditore" %>
+          <%# TK is the creditor here, the other party is the Debitori (see plaintiff_label) %>
           <div>
-            <%= form.label :plaintiff, 'Kreditori', class: 'block text-gray-600 font-semibold' %>
+            <%= form.label :plaintiff, 'Debitori', class: 'block text-gray-600 font-semibold' %>
             <%= form.text_field :plaintiff, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
           </div>
         <% elsif form.object.category == "lendet_permbarimore_debitore" %>
           <div>
-            <%= form.label :plaintiff, 'Debitori', class: 'block text-gray-600 font-semibold' %>
+            <%= form.label :plaintiff, 'Kreditori', class: 'block text-gray-600 font-semibold' %>
             <%= form.text_field :plaintiff, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
           </div>
         <% else %>
@@ -62,9 +63,10 @@
 
         <% if %w[lendet_penale lendet_administrative_inspektoriat lendet_administrative].exclude?(form.object.category) %>
           <div>
+            <%# Active courts (Admin → Gjykatat) + the lawsuit's current court even if it was deactivated %>
             <%= form.label :court, 'Gjykata', class: 'block text-gray-600 font-semibold' %>
             <%= form.select :court,
-                            options_for_select(Lawsuit.courts.map { |key, value| [value, key] }, form.object.court),
+                            options_for_select((Court.active.ordered.pluck(:name) + [form.object.court]).compact_blank.uniq, form.object.court),
                             { prompt: '' },
                             class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
           </div>
@@ -134,6 +136,8 @@
         <% end %>
 
 
+
+        <%= render 'lawsuits/representatives_fields' if policy(@lawsuit).assign_representatives? %>
 
         <div>
           <%= form.label :description, 'Përshkrimi i Lëndës', class: 'block text-gray-600 font-semibold' %>
@@ -218,7 +222,7 @@
         <% if @lawsuit.new_record? %>
           <%= form.submit 'Krijo Lëndën', class: 'bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition' %>
         <% else %>
-          <% if !current_user.operator? %>
+          <% if policy(@lawsuit).update? %>
             <%= form.submit 'Ruaj Ndryshimet', class: 'bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition' %>
           <% end %>
         <% end %>

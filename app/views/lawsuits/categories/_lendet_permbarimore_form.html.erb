@@ -8,7 +8,7 @@
     <p class="text-gray-800"><%= @lawsuit.lawsuit_number.present? ? @lawsuit.lawsuit_number : 'N/A' %></p>
   </div>
   <div>
-    <strong class="text-gray-600"><%= @lawsuit.category == "lendet_permbarimore_kreditore" ? "Kreditori" : "Debitori" %>:</strong>
+    <strong class="text-gray-600"><%= plaintiff_label(@lawsuit.category) %>:</strong>
     <p class="text-gray-800"><%= @lawsuit.plaintiff.present? ? @lawsuit.plaintiff : 'N/A' %></p>
   </div>
   <div>
@@ -23,7 +23,7 @@
 <div class="flex justify-between items-center gap-x-8">
   <div>
     <strong class="text-gray-600">Gjykata:</strong>
-    <p class="text-gray-800"><%= @lawsuit.court.present? ? @lawsuit.enum_value(:court) : 'N/A' %></p>
+    <p class="text-gray-800"><%= @lawsuit.court.presence || 'N/A' %></p>
   </div>
   <div>
     <strong class="text-gray-600">Zhvillimi i Procedurës:</strong>

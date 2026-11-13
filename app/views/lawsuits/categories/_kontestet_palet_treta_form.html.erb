@@ -19,7 +19,7 @@
 <div class="flex justify-between items-center gap-x-8">
   <div>
     <strong class="text-gray-600">Gjykata:</strong>
-    <p class="text-gray-800"><%= @lawsuit.court.present? ? @lawsuit.enum_value(:court) : 'N/A' %></p>
+    <p class="text-gray-800"><%= @lawsuit.court.presence || 'N/A' %></p>
   </div>
   <div>
     <strong class="text-gray-600">Rreziku:</strong>

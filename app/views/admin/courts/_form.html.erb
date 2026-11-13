@@ -1,0 +1,35 @@
+<%# Shared by new + edit. Renaming also renames the court in the lawsuits that use it (Court#rename_in_lawsuits). %>
+<%= form_with model: [:admin, court], local: true do |form| %>
+  <% if court.errors.any? %>
+    <div class="bg-red-100 border border-red-400 text-red-600 p-4 rounded-lg mb-4">
+      <% court.errors.full_messages.each do |message| %>
+        <div><%= message %></div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="space-y-4">
+    <div>
+      <%= form.label :name, 'Emri i Gjykatës', class: 'block text-gray-600 font-semibold' %>
+      <%= form.text_field :name, required: true, maxlength: 150, class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+      <% if court.persisted? %>
+        <% used = court.lawsuits_count %>
+        <p class="text-xs text-gray-500 mt-1">
+          <%= used %> lëndë e përdorin këtë gjykatë. Nëse ndryshoni emrin, ndryshohet edhe në to.
+        </p>
+      <% end %>
+    </div>
+
+    <div>
+      <%= form.label :position, 'Renditja', class: 'block text-gray-600 font-semibold' %>
+      <%= form.number_field :position, required: true, step: 1, class: 'mt-1 block w-40 p-2 border border-gray-300 rounded' %>
+      <p class="text-xs text-gray-500 mt-1">Numri më i vogël del më lart në listë (p.sh. 10, 20, 30).</p>
+    </div>
+  </div>
+
+  <div class="flex justify-center space-x-4 mt-6">
+    <%= form.submit court.persisted? ? 'Ruaj Ndryshimet' : 'Shto Gjykatën',
+                    class: 'bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition cursor-pointer' %>
+    <%= link_to 'Kthehu Prapa', admin_courts_path, class: 'bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition' %>
+  </div>
+<% end %>

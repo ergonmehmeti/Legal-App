@@ -73,7 +73,8 @@ module Admin
     end
 
     def user_params
-      params.require(:user).permit(:name, :surname, :email, :kt_id, :role, :password, :password_confirmation)
+      params.require(:user).permit(:name, :surname, :email, :kt_id, :role, :password, :password_confirmation,
+                                   category_scopes: [])
     end
   end
 end

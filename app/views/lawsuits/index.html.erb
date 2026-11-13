@@ -2,25 +2,24 @@
   <h1 class="font-bold text-4xl">
     <%= render_page_title(@category) %>
   </h1>
-  <%= link_to "Krijo Lëndë", new_lawsuit_path(category: @category), class: "px-4 py-2 bg-gray-200 text-black border border-gray-300 rounded hover:bg-gray-300 transition " %>
+  <% if policy(Lawsuit).create? %>
+    <%= link_to "Krijo Lëndë", new_lawsuit_path(category: @category), class: "px-4 py-2 bg-gray-200 text-black border border-gray-300 rounded hover:bg-gray-300 transition " %>
+  <% end %>
 </div>
 <div data-controller="lawsuits">
   <%= form_with url: filtered_lawsuits_path(@category), method: :get, local: false, data: { controller: 'lawsuits', action: 'change->lawsuits#search' } do %>
     <div class="bg-white p-4 rounded-lg shadow-md w-full max-w-4xl">
-      <div class="flex space-x-4">
+      <div class="flex items-end space-x-4"><%# items-end: fields stay in one line when a label (e.g. Penale) wraps %>
+        <!-- Numri TK (title) Text Field -->
+        <div class="flex-1">
+          <%= label_tag :tk_number, 'Numri TK', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <%= text_field_tag :tk_number, params[:tk_number], class: 'w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+        </div>
+
         <!-- Plaintiff Text Field -->
         <div class="flex-1">
           <%= label_tag :plaintiff,
-                        case @category
-                        when "lendet_permbarimore_kreditore"
-                          "Kreditori"
-                        when "lendet_permbarimore_debitore"
-                          "Debitori"
-                        when "lendet_penale"
-                          "Paraqitësi i Kallëzimit / I Dëmtuari"
-                        else
-                          "Paditësi"
-                        end,
+                        plaintiff_label(@category),
                         class: 'block text-sm font-medium text-gray-700 mb-1' %>
           <%= text_field_tag :plaintiff, params[:plaintiff], class: 'w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
         </div>

@@ -16,6 +16,13 @@ class Lawsuit < ApplicationRecord
   
   belongs_to :deleted_by_user, class_name: 'User', optional: true
 
+  # Legal representatives ("Përfaqësues Ligjor"): one primary + optional secondary ones
+  has_many :lawsuit_representatives, dependent: :destroy
+  has_many :representatives, through: :lawsuit_representatives, source: :user
+  # THE rule "lawsuits this user represents" (primary or secondary). Used by LawsuitPolicy::Scope,
+  # Kryefaqja and "Lëndët e Mia": change it only here. Subquery (not a join): no duplicate rows.
+  scope :represented_by, ->(user) { where(id: LawsuitRepresentative.where(user_id: user.id).select(:lawsuit_id)) }
+
   # Validations: Prevent duplicate title + lawsuit_number combination among active lawsuits
   # Lawsuit_number alone can repeat (same case number in different categories)
   # Title alone can repeat (different cases with same title)
@@ -43,19 +50,8 @@ class Lawsuit < ApplicationRecord
     suspended: "Pezulluar",
     finished: "Përfunduar"
   }
-  enum court: {
-    themelore: "Gjykata Themelore",
-    themelore_2: "Gjykata Themelore Rigjykim 2",
-    komerciale: "Gjykata Komerciale Dh.Sh.1",
-    komerciale_2: "Gjykata Komerciale Dh.SH.2",
-    komerciale_rigjykim: "Gjykata Komerciale Dh.Sh.1 Rigjykim",
-    komerciale_2_rigjykim: "Gjykata Komerciale Dh.SH.2 Rigjykim",
-    apelit: "Gjykata e Apelit",
-    apelit_2: "Gjykata e Apelit 2",
-    supreme: "Gjykata Supreme",
-    supreme_2: "Gjykata Supreme 2",
-    kushtetuese: "Gjykata Kushtetuese"
-  }
+  # court = the court's NAME as text (e.g. "Gjykata Themelore"). The list of courts is the
+  # `courts` table, managed by admin_developer in the Admin area (see Court, TODO_COURTS.md).
   enum lawsuit_risk: {
     ulet: "Ulët",
     mesme: "Mesëm",
@@ -102,6 +98,11 @@ class Lawsuit < ApplicationRecord
 
   validates :lawsuit_amount_claim, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :provision, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  # Empty court in the form = no court (nil, not "")
+  before_validation { self.court = court.presence }
+  # A newly chosen court must be an active one. An old value (e.g. a court deactivated later)
+  # stays valid as long as it isn't changed.
+  validate :court_must_be_active, if: -> { court.present? && will_save_change_to_court? }
 
 
 
@@ -109,7 +110,7 @@ class Lawsuit < ApplicationRecord
   # category = Kategoria
   # description = Pershkrimi i Lendes
   # context_type = Natyra e Kontestit
-  # plaintiff = Paditesi - Paraqitesi i Kallezimit - Debitori - Kreditori
+  # plaintiff = Paditesi - Paraqitesi i Kallezimit - Debitori (TK Kreditor) - Kreditori (TK Debitor)
   # lawsuit_claim = "I Pandehuri"
   # lawsuit_number = Numri i Lendes
   # court = Gjykata
@@ -189,6 +190,96 @@ class Lawsuit < ApplicationRecord
     end
   end
 
+  def primary_representative
+    lawsuit_representatives.find(&:is_primary)&.user
+  end
+
+  def secondary_representatives
+    lawsuit_representatives.reject(&:is_primary).map(&:user)
+  end
+
+  # Replace all representatives of this lawsuit in one go (from the lawsuit form).
+  # primary_id: one user id or blank; secondary_ids: list of user ids (may be empty).
+  # The primary is never also stored as secondary. Unchanged rows are kept, so
+  # PaperTrail only records real changes.
+  def assign_representatives!(primary_id:, secondary_ids: [])
+    primary_id = primary_id.presence&.to_i
+    secondary_ids = Array(secondary_ids).compact_blank.map(&:to_i).uniq - [primary_id]
+    wanted = secondary_ids.index_with(false)
+    wanted[primary_id] = true if primary_id
+
+    # requires_new: if one assignment is invalid, everything in here is undone,
+    # even when this runs inside another transaction
+    transaction(requires_new: true) do
+      current = lawsuit_representatives.to_a
+      current.each do |rep|
+        if !wanted.key?(rep.user_id)
+          rep.destroy!
+        elsif rep.is_primary && !wanted[rep.user_id]
+          rep.update!(is_primary: false) # was primary, now secondary: free the slot first
+        end
+      end
+      wanted.each do |user_id, is_primary|
+        rep = current.find { |r| r.user_id == user_id && !r.destroyed? } ||
+              lawsuit_representatives.build(user_id: user_id)
+        rep.is_primary = is_primary
+        rep.save! if rep.new_record? || rep.changed?
+      end
+    end
+    lawsuit_representatives.reset
+  end
+
+  # Who was representative of this lawsuit and when, rebuilt from the PaperTrail history of
+  # LawsuitRepresentative (no extra table). One entry per period with the same role:
+  #   { user:, is_primary:, from:, to: (nil = still current), added_by:, removed_by: }
+  # A switch primary <-> secondary closes one period and opens the next.
+  # Only admins see this (LawsuitPolicy#view_representative_history?). Newest first.
+  def representative_history
+    rep_type = LawsuitRepresentative.name
+    live = lawsuit_representatives.to_a
+    # Removed rows only exist in their "destroy" version (object = the row as it was)
+    # Text search first (no JSON cast in SQL: an old history row in another format can't break the
+    # page), then a real check of each candidate in Ruby ("lawsuit_id":3 also matches 30, 31, ...)
+    removed_ids = PaperTrail::Version.where(item_type: rep_type, event: "destroy")
+                                     .where("object LIKE ?", %(%"lawsuit_id":#{id.to_i}%))
+                                     .select { |v| (v.object_deserialized rescue nil)&.dig("lawsuit_id") == id }
+                                     .map(&:item_id)
+    versions = PaperTrail::Version.where(item_type: rep_type, item_id: live.map(&:id) + removed_ids)
+                                  .order(:created_at, :id).group_by(&:item_id)
+
+    rows = versions.keys.union(live.map(&:id)).map do |item_id|
+      item_versions = versions.fetch(item_id, [])
+      live_rep = live.find { |r| r.id == item_id }
+      created = item_versions.find { |v| v.event == "create" }
+      destroyed = item_versions.find { |v| v.event == "destroy" }
+      # "update"/"destroy" versions hold the row as it was BEFORE that change
+      states = item_versions.reject { |v| v.event == "create" }.map { |v| v.object_deserialized || {} }
+      final = live_rep ? live_rep.attributes : states.last
+      next [] unless final
+
+      start_at = created&.created_at || Time.zone.parse(final["created_at"].to_s)
+      start_by = created&.whodunnit
+      is_primary = (states.first || final)["is_primary"]
+      periods = []
+      item_versions.select { |v| v.event == "update" }.each_with_index do |v, i|
+        next_primary = (states[i + 1] || final)["is_primary"]
+        next if next_primary == is_primary # nothing changed in the role
+        periods << { user_id: final["user_id"], is_primary: is_primary, from: start_at, to: v.created_at,
+                     added_by: start_by, removed_by: v.whodunnit }
+        start_at, start_by, is_primary = v.created_at, v.whodunnit, next_primary
+      end
+      periods << { user_id: final["user_id"], is_primary: is_primary, from: start_at,
+                   to: destroyed&.created_at, added_by: start_by, removed_by: destroyed&.whodunnit }
+    end.flatten
+
+    users = User.where(id: rows.flat_map { |r| [r[:user_id], r[:added_by], r[:removed_by]] }.compact).index_by(&:id)
+    rows.map do |r|
+      r.merge(user: users[r[:user_id].to_i],
+              added_by: r[:added_by] && users[r[:added_by].to_i],
+              removed_by: r[:removed_by] && users[r[:removed_by].to_i])
+    end.sort_by { |r| [r[:from], r[:to] ? 0 : 1] }.reverse
+  end
+
   # Hide a PDF: move it from pdf_files to deleted_pdf_files and record who/why.
   def hide_pdf!(attachment, user:, reason:)
     transaction do
@@ -232,6 +323,8 @@ class Lawsuit < ApplicationRecord
     # Apply filters conditionally
     results = results.where('plaintiff ILIKE ?', "%#{params[:plaintiff]}%") if params[:plaintiff].present?
     results = results.where('lawsuit_number ILIKE ?', "%#{params[:lawsuit_number]}%") if params[:lawsuit_number].present?
+    # "Numri TK" = the title column
+    results = results.where('title ILIKE ?', "%#{params[:tk_number]}%") if params[:tk_number].present?
     
     # Sort numeric titles numerically, non-numeric titles at the end alphabetically
     if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
@@ -242,4 +335,10 @@ class Lawsuit < ApplicationRecord
     end
   end
 
+
+  private
+
+  def court_must_be_active
+    errors.add(:court, "nuk është në listën e gjykatave aktive") unless Court.active.exists?(name: court)
+  end
 end

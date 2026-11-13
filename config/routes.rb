@@ -17,6 +17,8 @@ Rails.application.routes.draw do
   resources :lawsuits, only: [ :index, :new, :create, :edit, :update, :destroy ] do
     collection do
       get "new", action: :new, as: :new
+      # "Lëndët e Mia": lawsuits where the current admin / operator is a representative
+      get "mine", action: :mine, as: :mine
       # Specific routes MUST come before catch-all routes
       get "deleted/(:category)", action: :deleted, as: :deleted
       get "deleted/:category/:id", action: :show_deleted, as: :show_deleted_lawsuit
@@ -32,6 +34,12 @@ Rails.application.routes.draw do
   namespace :admin do
     root "dashboard#index"
     resources :users, only: %i[index new create edit update] do
+      member do
+        patch :toggle_active
+      end
+    end
+    # Courts ("Gjykatat"): no destroy, only (de)activate (see TODO_COURTS.md)
+    resources :courts, only: %i[index new create edit update] do
       member do
         patch :toggle_active
       end
