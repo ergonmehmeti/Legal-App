@@ -17,6 +17,11 @@
     <% end %>
 
     <div class="border rounded-lg p-4 bg-gray-50">
+      <strong class="text-gray-600">Statusi Final i Lëndës:</strong>
+      <p class="text-gray-800"><%= @lawsuit.final_status_label || 'N/A' %></p>
+    </div>
+
+    <div class="border rounded-lg p-4 bg-gray-50">
       <strong class="text-gray-600">Përfaqësuesi kryesor:</strong>
       <p class="text-gray-800"><%= @lawsuit.primary_representative ? "#{@lawsuit.primary_representative.name} #{@lawsuit.primary_representative.surname}" : 'N/A' %></p>
       <% if @lawsuit.secondary_representatives.any? %>

@@ -98,6 +98,16 @@ class Lawsuit < ApplicationRecord
 
   validates :lawsuit_amount_claim, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :provision, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+
+  # "Statusi Final i Lëndës" (all categories, optional). The key is stored, the label is shown,
+  # so a label can be corrected later without touching the data.
+  FINAL_STATUSES = {
+    "aprovohet" => "Aprovohet Padia",
+    "aprovohet_pjeserisht" => "Aprovohet pjesërisht Padia",
+    "refuzohet" => "Refuzohet Padia"
+  }.freeze
+  before_validation { self.final_status = final_status.presence }
+  validates :final_status, inclusion: { in: FINAL_STATUSES.keys }, allow_nil: true
   # Empty court in the form = no court (nil, not "")
   before_validation { self.court = court.presence }
   # A newly chosen court must be an active one. An old value (e.g. a court deactivated later)
@@ -130,6 +140,10 @@ class Lawsuit < ApplicationRecord
 
   def category_value
     self.class.categories[category]
+  end
+
+  def final_status_label
+    FINAL_STATUSES[final_status]
   end
 
   def enum_value(attribute)
