@@ -1,0 +1,64 @@
+<%# Legal representatives of the lawsuit (only admin / admin_developer see this, see LawsuitPolicy#assign_representatives?).
+    Saved by LawsuitsController#save_representatives. Choices: active users of every role except
+    admin_developer, plus anyone already assigned (e.g. a deactivated user) so that saving the form never
+    drops them silently. Only the Përfaqësues Ligjor role is limited to assigned lawsuits. %>
+<% assigned = @lawsuit.persisted? ? @lawsuit.lawsuit_representatives.includes(:user).to_a : [] %>
+<% choices = (User.assignable_representatives.to_a + assigned.map(&:user)).uniq.sort_by { |u| [u.name.to_s, u.surname.to_s] } %>
+<% label_for = ->(u) { "#{u.name} #{u.surname} (#{u.role_label})#{' (joaktiv)' unless u.active?}" } %>
+<%# After a failed save, keep what was chosen; otherwise show what is stored %>
+<% sent = params[:lawsuit] || {} %>
+<% primary_id = sent.key?(:primary_representative_id) ? sent[:primary_representative_id].to_s : assigned.find(&:is_primary)&.user_id.to_s %>
+<% secondary_ids = sent.key?(:secondary_representative_ids) ? Array(sent[:secondary_representative_ids]).map(&:to_s) : assigned.reject(&:is_primary).map { |r| r.user_id.to_s } %>
+
+<div class="border rounded-lg p-4 bg-gray-50">
+  <div>
+    <%= label_tag 'lawsuit_primary_representative_id', 'Përfaqësuesi kryesor', class: 'block text-gray-600 font-semibold' %>
+    <%= select_tag 'lawsuit[primary_representative_id]',
+                   options_for_select(choices.map { |u| [label_for.(u), u.id.to_s] }, primary_id),
+                   include_blank: '-- Pa përfaqësues --',
+                   id: 'lawsuit_primary_representative_id',
+                   class: 'mt-1 block w-full p-2 border border-gray-300 rounded' %>
+  </div>
+
+  <%# Other representatives: one dropdown per person, "+" adds one, "×" removes one.
+      Empty dropdowns and duplicates are ignored when saving (Lawsuit#assign_representatives!). %>
+  <% secondary_select = ->(selected) {
+       content_tag(:div, class: 'flex items-center gap-2 mt-2 js-secondary-row') do
+         select_tag('lawsuit[secondary_representative_ids][]',
+                    options_for_select(choices.map { |u| [label_for.(u), u.id.to_s] }, selected),
+                    include_blank: '-- Zgjidh --', id: nil,
+                    class: 'block w-full p-2 border border-gray-300 rounded') +
+         button_tag('×', type: 'button', title: 'Hiq', onclick: 'removeSecondaryRepresentative(this)',
+                    class: 'px-3 py-1 text-lg leading-none border border-red-400 text-red-600 rounded hover:bg-red-600 hover:text-white transition')
+       end
+     } %>
+  <div class="mt-4">
+    <span class="block text-gray-600 font-semibold">Përfaqësues të tjerë <span class="font-normal text-sm text-gray-500">(vetëm për raste të veçanta)</span></span>
+    <%# Empty value first: with no dropdowns left the browser sends nothing, this makes "none" arrive %>
+    <%= hidden_field_tag 'lawsuit[secondary_representative_ids][]', '', id: nil %>
+    <div id="secondary-representatives">
+      <% secondary_ids.compact_blank.each do |id| %>
+        <%= secondary_select.(id) %>
+      <% end %>
+    </div>
+    <template id="secondary-representative-template"><%= secondary_select.(nil) %></template>
+    <button type="button" onclick="addSecondaryRepresentative()"
+            class="mt-2 px-3 py-1 text-sm border border-gray-500 text-gray-600 rounded hover:bg-gray-500 hover:text-white transition">
+      + Shto përfaqësues
+    </button>
+  </div>
+
+  <script>
+    function addSecondaryRepresentative() {
+      const template = document.getElementById('secondary-representative-template');
+      document.getElementById('secondary-representatives').appendChild(template.content.cloneNode(true));
+    }
+    function removeSecondaryRepresentative(button) {
+      button.closest('.js-secondary-row').remove();
+    }
+  </script>
+
+  <% if choices.empty? %>
+    <p class="text-sm text-gray-500 mt-2">Nuk ka ende përdorues që mund të caktohen si përfaqësues (krijohen te Admin → Përdoruesit).</p>
+  <% end %>
+</div>

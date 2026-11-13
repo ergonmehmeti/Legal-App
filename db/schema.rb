@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_11_06_140000) do
+ActiveRecord::Schema[7.2].define(version: 2026_11_12_130000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -47,6 +47,27 @@ ActiveRecord::Schema[7.2].define(version: 2026_11_06_140000) do
     t.integer "user_id", null: false
     t.index ["lawsuit_id"], name: "index_comments_on_lawsuit_id"
     t.index ["user_id"], name: "index_comments_on_user_id"
+  end
+
+  create_table "courts", force: :cascade do |t|
+    t.string "name", null: false
+    t.boolean "active", default: true, null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "lower((name)::text)", name: "index_courts_on_lower_name", unique: true
+  end
+
+  create_table "lawsuit_representatives", force: :cascade do |t|
+    t.integer "lawsuit_id", null: false
+    t.integer "user_id", null: false
+    t.boolean "is_primary", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["lawsuit_id", "user_id"], name: "index_lawsuit_representatives_on_lawsuit_id_and_user_id", unique: true
+    t.index ["lawsuit_id"], name: "index_lawsuit_representatives_on_lawsuit_id"
+    t.index ["lawsuit_id"], name: "index_lawsuit_representatives_one_primary", unique: true, where: "is_primary"
+    t.index ["user_id"], name: "index_lawsuit_representatives_on_user_id"
   end
 
   create_table "lawsuits", force: :cascade do |t|
@@ -111,6 +132,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_11_06_140000) do
     t.integer "kt_id"
     t.integer "role"
     t.boolean "active", default: true, null: false
+    t.string "category_scopes", default: [], null: false, array: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["kt_id"], name: "index_users_on_kt_id", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
@@ -130,6 +152,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_11_06_140000) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "comments", "lawsuits"
   add_foreign_key "comments", "users"
+  add_foreign_key "lawsuit_representatives", "lawsuits"
+  add_foreign_key "lawsuit_representatives", "users"
   add_foreign_key "pdf_file_deletions", "active_storage_attachments", column: "attachment_id"
   add_foreign_key "pdf_file_deletions", "lawsuits"
   add_foreign_key "pdf_file_deletions", "users", column: "deleted_by_user_id"

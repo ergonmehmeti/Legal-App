@@ -40,3 +40,9 @@ en:
         password: "Fjalëkalimi"
         password_confirmation: "Konfirmimi i fjalëkalimit"
         current_password: "Fjalëkalimi aktual"
+        category_scopes: "Qasja në kategori"
+      court:
+        name: "Emri"
+        position: "Renditja"
+      lawsuit:
+        court: "Gjykata"

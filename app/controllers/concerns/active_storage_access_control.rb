@@ -26,6 +26,7 @@ module ActiveStorageAccessControl
 
   # Hidden ("deleted") PDFs, and all PDFs of archived (deleted) lawsuits,
   # open only for admin_developer, even from old links.
+  # A legal representative only opens files of their own lawsuits.
   # Runs after ActiveStorage::SetBlob has loaded @blob.
   module BlockHiddenFiles
     extend ActiveSupport::Concern
@@ -43,7 +44,15 @@ module ActiveStorageAccessControl
       hidden_pdf = attachments.where(name: "deleted_pdf_files")
       archived_lawsuit_pdf = attachments.where(record_type: "Lawsuit", record_id: Lawsuit.discarded.select(:id))
 
-      head :not_found if hidden_pdf.or(archived_lawsuit_pdf).exists?
+      return head :not_found if hidden_pdf.or(archived_lawsuit_pdf).exists?
+
+      # Legal representative: only files of lawsuits they may see (assigned + category scopes,
+      # same rule as LawsuitPolicy::Scope); an old link to another lawsuit's PDF must not open
+      if current_user&.legal_representative?
+        own_lawsuits = LawsuitPolicy::Scope.new(current_user, Lawsuit).resolve.select(:id)
+        own_file = attachments.where(record_type: "Lawsuit", record_id: own_lawsuits)
+        head :not_found unless own_file.exists?
+      end
     end
   end
 end

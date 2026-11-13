@@ -1,0 +1,55 @@
+<%# "Lëndët e Mia" (LawsuitsController#mine): lawsuits where the current admin / operator is a representative %>
+<div class="flex justify-between items-center">
+  <h1 class="font-bold text-4xl">Lëndët e Mia</h1>
+</div>
+<div data-controller="lawsuits">
+  <%= form_with url: mine_lawsuits_path, method: :get, local: false, data: { controller: 'lawsuits', action: 'change->lawsuits#search' } do %>
+    <div class="bg-white p-4 rounded-lg shadow-md w-full max-w-5xl">
+      <div class="flex items-end space-x-4"><%# items-end: fields stay in one line when a label (e.g. Penale) wraps %>
+        <!-- Category (only on this page) -->
+        <div class="flex-1">
+          <%= label_tag :category, 'Kategoria', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <%= select_tag :category, options_for_select(@my_categories.map { |key, label| [label, key] }, selected: params[:category]), { prompt: 'Të gjitha', class: 'w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' } %>
+        </div>
+
+        <!-- Numri TK (title) Text Field -->
+        <div class="flex-1">
+          <%= label_tag :tk_number, 'Numri TK', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <%= text_field_tag :tk_number, params[:tk_number], class: 'w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+        </div>
+
+        <!-- Plaintiff Text Field -->
+        <div class="flex-1">
+          <%= label_tag :plaintiff, plaintiff_label(@category), class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <%= text_field_tag :plaintiff, params[:plaintiff], class: 'w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+        </div>
+
+        <!-- Lawsuit Number Text Field -->
+        <div class="flex-1">
+          <%= label_tag :lawsuit_number, 'Numri i Lendes', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <%= text_field_tag :lawsuit_number, params[:lawsuit_number], class: 'w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' %>
+        </div>
+
+        <!-- Status Select Dropdown -->
+        <div class="flex-1">
+          <%= label_tag :status, 'Statusi', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+          <%= select_tag :status, options_for_select(Lawsuit.statuses.map { |key, value| [value, key] }, selected: params[:status]), { prompt: 'Kryesoret', class: 'w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500' } %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div data-turbo-frame="lawsuit-results">
+    <% if @lawsuits.any? %>
+      <%= render partial: 'lawsuits/lawsuits_table', locals: { lawsuits: @lawsuits, category: nil, show_category: true } %>
+    <% elsif @has_lawsuits %>
+      <p class="text-gray-900 italic">Nuk ka të dhëna për të shfaqur.</p>
+    <% else %>
+      <p class="text-gray-900 italic">Nuk jeni caktuar si përfaqësues në asnjë lëndë.</p>
+    <% end %>
+  </div>
+  <%= will_paginate @lawsuits,
+                    previous_label: '<span class="px-4 py-2 rounded-md bg-gray-200 hover:bg-blue-300">Mbrapa</span>',
+                    next_label: '<span class="px-4 py-2 rounded-md bg-gray-200 hover:bg-blue-300">Para</span>',
+                    class: 'flex justify-center mt-4 space-x-2' %>
+</div>

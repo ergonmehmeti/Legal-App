@@ -27,7 +27,7 @@ class LawsuitPdfFilesController < ApplicationController
   private
 
   def set_lawsuit
-    @lawsuit = Lawsuit.kept.find(params[:lawsuit_id])
+    @lawsuit = policy_scope(Lawsuit).kept.find(params[:lawsuit_id])
   end
 
   def lawsuit_page

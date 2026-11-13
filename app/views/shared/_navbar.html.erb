@@ -1,23 +1,30 @@
 <nav class="w-64 p-4 h-screen bg-gray-600 sticky top-0 flex flex-col">
   <!-- App Logo and Name -->
-  <div class="flex items-center mb-6 bg-gray-400 p-4 rounded-lg">
+  <%# Logo + name = link to the home page (Kryefaqja) %>
+  <%= link_to root_path, title: "Kryefaqja", class: "flex items-center mb-6 bg-gray-400 p-4 rounded-lg hover:bg-gray-300 transition" do %>
     <%= image_tag 'vala.png', class: 'w-20 h-20 rounded-full' %>
     <h1 class="text-lg font-bold text-purple-900 ml-3">
       Aplikacioni Ligjor
     </h1>
-  </div>
+  <% end %>
 
-  <div class="flex items-center">
-    <%= image_tag 'logo.png', class: 'w-16' %>
-    <h1 class="text-md py-2 text-gray-50 font-bold md:block ml-4">
-      <%= link_to "Kryefaqjaa", root_path, class: "text-gray-50 hover:underline" %>
-    </h1>
-  </div>
+  <%# "Lëndët e Mia": admin / operator, lawsuits where they are a representative (LawsuitPolicy#mine?) %>
+  <% if policy(Lawsuit).mine? %>
+    <ul class="flex flex-col text-gray-50">
+      <li>
+        <% mine_active = controller_name == 'lawsuits' && action_name == 'mine' ? 'bg-gray-700' : '' %>
+        <%= link_to mine_lawsuits_path, class: "block px-4 py-2 rounded hover:bg-gray-700 transition #{mine_active}" do %>
+          <span class="md:inline-block">Lëndët e Mia</span>
+        <% end %>
+      </li>
+    </ul>
+  <% end %>
 
   <ul class="flex flex-col text-gray-50">
-    <% Lawsuit.categories.each do |key, value| %>
+    <%# Legal representative: only categories in which they have lawsuits %>
+    <% visible_categories.each do |key, value| %>
       <li>
-        <% active_class = params[:category] == key ? 'bg-gray-700' : '' %>
+        <% active_class = params[:category] == key && action_name != 'mine' ? 'bg-gray-700' : '' %>
         <%= link_to filtered_lawsuits_path(key),
                     class: "block px-4 py-2 rounded hover:bg-gray-700 transition #{active_class}" do %>
           <span class="md:inline-block"><%= value %></span>
@@ -43,12 +50,14 @@
       </li>
     <% end %>
     
-    <li class="flex items-center">
-      <%= link_to provisions_path, class: "flex items-center px-4 py-2 font-bold text-gray-50 rounded hover:bg-gray-700 transition" do %>
-        <i class="fas fa-euro-sign  mr-2"></i> <!-- Euro Icon -->
-        <span class="md:inline-block">Provizionimet</span>
-      <% end %>
-    </li>
+    <% unless current_user.legal_representative? %>
+      <li class="flex items-center">
+        <%= link_to provisions_path, class: "flex items-center px-4 py-2 font-bold text-gray-50 rounded hover:bg-gray-700 transition" do %>
+          <i class="fas fa-euro-sign  mr-2"></i> <!-- Euro Icon -->
+          <span class="md:inline-block">Provizionimet</span>
+        <% end %>
+      </li>
+    <% end %>
   </ul>
 
 

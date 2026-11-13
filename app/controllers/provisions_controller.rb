@@ -1,4 +1,6 @@
 class ProvisionsController < ApplicationController
+  # Provizionimet + CSV export: not for legal representatives (they only view their lawsuits)
+  before_action :block_legal_representative
 
   require 'csv'
   def index

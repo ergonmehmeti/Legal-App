@@ -1,14 +1,21 @@
 class LawsuitsController < ApplicationController
   #before_action :set_lawsuit, only: [:show, :edit, :update, :destroy]
   def index
-    @category = params[:category] || Lawsuit.categories.keys.first
-    @lawsuits = Lawsuit.important_lawsuits(@category)
-    # Apply filtering based on search parameters
-    if params[:plaintiff].present? || params[:lawsuit_number].present? || params[:status].present?
-      @lawsuits = Lawsuit.filter_by_params(@category, params)
+    @category = params[:category] || visible_categories.keys.first
+    # A legal representative only opens categories in which they have lawsuits
+    unless visible_categories.key?(@category)
+      return redirect_to root_path, alert: "Nuk keni qasje në këtë kategori."
     end
 
-    @lawsuits = @lawsuits.paginate(page: params[:page], per_page: 10)
+    # policy_scope: a legal representative only gets their own lawsuits
+    lawsuits = policy_scope(Lawsuit)
+    @lawsuits = lawsuits.important_lawsuits(@category)
+    # Apply filtering based on search parameters
+    if params[:tk_number].present? || params[:plaintiff].present? || params[:lawsuit_number].present? || params[:status].present?
+      @lawsuits = lawsuits.filter_by_params(@category, params)
+    end
+
+    @lawsuits = @lawsuits.preload(lawsuit_representatives: :user).paginate(page: params[:page], per_page: 10)
 
 
     respond_to do |format|
@@ -18,22 +25,47 @@ class LawsuitsController < ApplicationController
 
   end
 
+  # "Lëndët e Mia": every (non-archived) lawsuit where the current user is a representative
+  # (primary or secondary), across all categories, with an extra "Kategoria" filter.
+  def mine
+    authorize Lawsuit, :mine?
+
+    my_lawsuits = Lawsuit.kept.represented_by(current_user)
+    # Category filter: only the categories in which the user has lawsuits
+    used = my_lawsuits.distinct.pluck(:category)
+    @my_categories = Lawsuit.categories.select { |key, _| used.include?(key) }
+    @has_lawsuits = used.any?
+
+    # One category chosen: the table behaves like that category's page (column names, Gjykata).
+    # nil = "Të gjitha" (mixed categories, the table shows a "Kategoria" column)
+    @category = @my_categories.key?(params[:category]) ? params[:category] : nil
+    # Same filters as the category pages (status empty = "Kryesoret": active + pending)
+    @lawsuits = my_lawsuits.filter_by_params(@category || @my_categories.keys, params)
+                           .preload(lawsuit_representatives: :user)
+                           .paginate(page: params[:page], per_page: 10)
+  end
+
   def show
     @category = params[:category] || Lawsuit.categories.first
-    @lawsuit = Lawsuit.kept.find(params[:id])
+    # Someone else's lawsuit is treated like a missing one (no hint that it exists)
+    @lawsuit = policy_scope(Lawsuit).kept.find(params[:id])
+    authorize @lawsuit
   rescue ActiveRecord::RecordNotFound
     redirect_to filtered_lawsuits_path(category: @category)
   end
 
   def new
+    authorize Lawsuit, :create?
     @lawsuit = Lawsuit.new(category: params[:category])
     @lawsuit.comments.build
     @lawsuit.provisions.build
   end
 
   def create
+    authorize Lawsuit, :create?
     @lawsuit = Lawsuit.new(lawsuit_params)
     if @lawsuit.save
+      save_representatives
       redirect_to show_lawsuits_path(category: @lawsuit.category, id: @lawsuit.id)
     else
       render :new, status: :unprocessable_entity
@@ -60,6 +92,7 @@ class LawsuitsController < ApplicationController
       @lawsuit.pdf_files.attach(lawsuit_params[:pdf_files])
     end
     if @lawsuit.update(lawsuit_params.except(:pdf_files))
+      save_representatives
       redirect_to show_lawsuits_path( category: @lawsuit.category, id: @lawsuit.id)
     else
       render :edit, status: :unprocessable_entity
@@ -149,6 +182,27 @@ class LawsuitsController < ApplicationController
 
 
   private
+
+  # Representatives from the lawsuit form ("Përfaqësuesi kryesor" + "Përfaqësues të tjerë").
+  # Only for roles that may assign them, and only if the form actually sent the field:
+  # a form without it (e.g. the operator's create form) leaves the assignments untouched.
+  def save_representatives
+    return unless policy(@lawsuit).assign_representatives?
+    return unless params[:lawsuit]&.key?(:primary_representative_id)
+
+    reps = params.require(:lawsuit).permit(:primary_representative_id, secondary_representative_ids: [])
+    @lawsuit.assign_representatives!(
+      primary_id: reps[:primary_representative_id],
+      secondary_ids: reps[:secondary_representative_ids]
+    )
+  rescue ActiveRecord::RecordInvalid => e
+    flash[:alert] = "Përfaqësuesit nuk u ruajtën: #{e.record.errors.full_messages.to_sentence}"
+  rescue ActiveRecord::RecordNotUnique
+    # Two saves at the same moment (double click, or two admins): the database allows one primary
+    # per lawsuit, so the second one is refused. Nothing half-saved (assign_representatives! is one transaction).
+    flash[:alert] = "Përfaqësuesit nuk u ruajtën: lënda u ruajt njëkohësisht dy herë. " \
+                    "Kontrolloni përfaqësuesit dhe provoni përsëri nëse duhet."
+  end
 
   def redirect_archived_lawsuit
     redirect_to filtered_lawsuits_path(category: params[:category]),
