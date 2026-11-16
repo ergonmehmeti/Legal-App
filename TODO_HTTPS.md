@@ -70,7 +70,17 @@ Draft (for reference):
 - [ ] Calendar reminder 1 month before the certificate expires (date from Step 2), renewal with IT,
       then replace the files on the server and `sudo docker-compose restart nginx`
 
-## Also on this branch (deploy together with HTTPS)
+## Also on this branch (small changes, deployed on their own)
 - [x] CSV export (Provizionimet → "Eksporto Provizionimet në CSV"): Kategoria and Statusi as readable names
       ("Kontestet e Punës", "Aktive") instead of codes (`kontestet_punes`, `active`). Court names were
-      already full names since the courts change. Tested locally: no codes left
+      already full names since the courts change. Tested locally: no codes left. Deployed 2026-11-16 (restart only)
+- [x] Font Awesome icons show (2026-11-16): `application.css` → `application.scss`, so `@import "font-awesome"`
+      is compiled by Sass (before: passed to the browser as-is → /assets/font-awesome 404, no icon ever showed).
+      Tested in local Docker: page 200, icon rules in the CSS, icon fonts load (200). About 32 icons
+      (navbar, login, lawsuit page, admin). Server: `git pull` → `sudo docker-compose restart app` (no build)
+- [ ] Check in the browser: icons visible (navbar, login page, lawsuit page, Admin)
+- [x] Docker base image pinned (2026-11-16): `FROM ruby:3.3-alpine` → `ruby:3.3-alpine3.21` (the plain tag moved
+      to Alpine 3.24 and broke the build with the Alpine 3.21 repos). Server today: Alpine 3.21.3, Ruby 3.3.7 →
+      after the next build Ruby 3.3.10 (same as the Mac). Tested locally: `--pull` + `--no-cache` build OK,
+      Alpine 3.21.5, Ruby 3.3.10, OpenSSL works, login page 200, DB OK.
+      Server: needs `sudo docker-compose build` (downloads ruby:3.3-alpine3.21 once) → `down` → `up -d`

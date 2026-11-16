@@ -14,5 +14,7 @@
  *= require_self
  */
 
+// Font Awesome icons (gem font-awesome-sass). Needs Sass: in the old application.css this @import
+// was passed to the browser as-is (/assets/font-awesome 404), so no icon ever showed.
 @import "font-awesome";
 
