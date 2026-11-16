@@ -18,5 +18,5 @@ Created 2026-11-13, branch `emehmeti/add_field_to_lawsuit`.
 - [x] Tested in Docker (rolled back): 38 checks (form in all 9 categories, save / show / edit per category,
       clear, unknown value rejected, not in the table)
 - [x] Check in the browser (OK, 2026-11-13)
-- [ ] Deploy: backup → `git pull` → `sudo docker-compose build` → `down` → `up -d` → `tailwindcss:build`
+- [x] Deploy (2026-11-13, with PR #26): backup → `git pull` → `sudo docker-compose build` → `down` → `up -d` → `tailwindcss:build`
       → `restart` (1 migration, adds an empty column)
