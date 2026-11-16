@@ -229,7 +229,8 @@ Nothing else in the app is visible to them. Admins assign representatives. Nothi
 - [ ] Create the legal representative accounts in the Admin area, assign their lawsuits / categories
       2026-11-16: 17 accounts (Albert Kadriu = Admin, 16 = Përfaqësues Ligjor, same starting password) with a
       one-time script outside git (skips existing emails). Tested in local Docker: 17 created, second run
-      skips all 17. Still to do: run it on the server, then assign lawsuits / categories in the app
+      skips all 17. Server 2026-11-16: 17 created (5 → 22 users), backup legal_app_20261116_0835.dump.
+      Still to do: assign lawsuits / categories in the app
 - [ ] Tell the legal team: CSV export now shows full court names ("Gjykata Themelore" instead of `themelore`)
 - Deployed 2026-11-13 (PRs #26 + #27): 4 migrations ran, court counts identical before/after
   (1161 lawsuits), 12 active courts. Backup: legal_app_20261113_0941.dump + storage_20261113

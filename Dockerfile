@@ -1,5 +1,7 @@
-# Use the lightweight Ruby 3.3 Alpine image
-FROM ruby:3.3-alpine
+# Ruby 3.3 on Alpine 3.21, pinned: the plain `ruby:3.3-alpine` tag moves to newer Alpine versions,
+# which breaks the Alpine 3.21 repos + openssl below (Ruby's openssl stops working, build fails).
+# Change both together if Alpine is ever upgraded.
+FROM ruby:3.3-alpine3.21
 
 # Define build-time arguments
 ARG RAILS_ENV
