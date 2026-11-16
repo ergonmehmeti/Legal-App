@@ -50,7 +50,7 @@ Goal: let the **admin_developer** create, edit and deactivate users from the app
 ### Step 8: Verify in Docker
 - [x] `docker-compose build && docker-compose up -d` (runs the migration)
 - [x] Test as admin_developer and operator; test an inactive user login
-- [ ] Test as `admin` (no admin user in the Docker/Postgres DB yet; create one from the Users screen)
+- [x] Test as `admin` (done with TODO_LAWYER.md Step 7, 2026-11-16) (no admin user in the Docker/Postgres DB yet; create one from the Users screen)
 
 ## Later / optional (not in this TODO)
 - Password complexity (letter + number)

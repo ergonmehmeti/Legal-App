@@ -29,9 +29,10 @@ Add / rename / deactivate courts from the app, without a developer or a deploy.
 ## Steps (each step = its own git step)
 
 ### Step 0: Check live data (read only, on the server, before anything else)
-- [ ] `sudo docker-compose exec -T app bin/rails runner 'p ActiveRecord::Base.connection.select_rows("SELECT court, COUNT(*) FROM lawsuits GROUP BY court ORDER BY 2 DESC")'`
-- [ ] Every name must be one of the 12 names (or empty). Anything else: decide what to do with it
+- [x] `sudo docker-compose exec -T app bin/rails runner 'p ActiveRecord::Base.connection.select_rows("SELECT court, COUNT(*) FROM lawsuits GROUP BY court ORDER BY 2 DESC")'`
+- [x] Every name must be one of the 12 names (or empty). Anything else: decide what to do with it
       first (add it as a court, or fix those lawsuits).
+- 2026-11-13 on the server: all names match the 12 courts exactly, 11 lawsuits without a court
 
 ### Step 1: Courts table (back end)
 - [x] Migration `20261112120000_create_courts` (name unique not null, active default true, position)
@@ -84,7 +85,8 @@ Add / rename / deactivate courts from the app, without a developer or a deploy.
       lawsuits with another spelling. Tested: 8 checks
 
 ### Step 5: Deploy
-- [ ] Backup first (pg_dump + rsync storage, as in the deploy checklist)
-- [ ] Step 0 query again right before deploying
-- [ ] `git pull` → `sudo docker-compose build` → `down` → `up -d` → `tailwindcss:build` → `restart`
-- [ ] Step 0 query again after: same counts as before (nothing in lawsuits changed)
+- [x] Backup first (pg_dump + rsync storage, as in the deploy checklist)
+- [x] Step 0 query again right before deploying
+- [x] `git pull` → `sudo docker-compose build` → `down` → `up -d` → `tailwindcss:build` → `restart`
+- [x] Step 0 query again after: same counts as before (nothing in lawsuits changed)
+- Deployed 2026-11-13 together with TODO_LAWYER.md (counts identical, 12 active courts)

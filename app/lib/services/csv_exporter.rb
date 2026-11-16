@@ -33,9 +33,9 @@ module Services
               lawsuit.plaintiff,
               lawsuit.title,
               lawsuit.lawsuit_number,
-              lawsuit.category,
+              category_label(lawsuit),
               lawsuit.court,
-              lawsuit.status,
+              status_label(lawsuit),
               lawsuit.lawsuit_amount_claim,
               provision_previous_value,
               provision_selected_value
@@ -47,9 +47,9 @@ module Services
               lawsuit.plaintiff,
               lawsuit.title,
               lawsuit.lawsuit_number,
-              lawsuit.category,
+              category_label(lawsuit),
               lawsuit.court,
-              lawsuit.status,
+              status_label(lawsuit),
               lawsuit.lawsuit_amount_claim,
               provision_previous_value,
               provision_selected_value
@@ -57,6 +57,18 @@ module Services
           end
         end
       end
+    end
+
+    private
+
+    # Readable names instead of codes ("Kontestet e Punës", not "kontestet_punes")
+    def category_label(lawsuit)
+      Lawsuit.categories[lawsuit.category] || lawsuit.category
+    end
+
+    # "Aktive", not "active"
+    def status_label(lawsuit)
+      lawsuit.status.present? ? lawsuit.enum_value(:status) : nil
     end
   end
 end

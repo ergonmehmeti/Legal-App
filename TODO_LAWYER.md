@@ -199,34 +199,40 @@ Nothing else in the app is visible to them. Admins assign representatives. Nothi
 - Not changed (decided): representatives see provisions of lawsuits they can see; Kryefaqja counts all statuses
 
 ### Step 7: Verify in Docker
-- [ ] Create 2 legal representative users in the Admin area
-- [ ] As admin: assign user A as primary on 3 lawsuits in 2 categories, user B as secondary on
+- [x] Create 2 legal representative users in the Admin area
+- [x] As admin: assign user A as primary on 3 lawsuits in 2 categories, user B as secondary on
       one of them; names show on the lawsuit page and in the table
-- [ ] As A: navbar shows only those 2 categories; Kryefaqja shows only those 2 with the right
+- [x] As A: navbar shows only those 2 categories; Kryefaqja shows only those 2 with the right
       counts; lists show only the assigned lawsuits; lawsuit page shows PDFs and comments but
       no Ndrysho / Delete / comment form / Krijo Lëndë
-- [ ] As A, by typing URLs: another lawsuit, another category, edit page, new lawsuit,
+- [x] As A, by typing URLs: another lawsuit, another category, edit page, new lawsuit,
       Provizionimet, CSV export, /admin → all blocked; a PDF link of another lawsuit → 404
-- [ ] As B: sees the shared lawsuit only
-- [ ] Remove A from a lawsuit → it disappears for A; deactivate B → login blocked
-- [ ] As operator: can create a lawsuit, cannot edit; sees everything as before
-- [ ] As admin / admin_developer: everything as before (list, show, edit, PDFs, archive, users)
-- [ ] Category scope (6e): give A "Përmbarimore" (both) → sees all Përmbarimore lawsuits read only,
+- [x] As B: sees the shared lawsuit only
+- [x] Remove A from a lawsuit → it disappears for A; deactivate B → login blocked
+- [x] As operator: can create a lawsuit, cannot edit; sees everything as before
+- [x] As admin / admin_developer: everything as before (list, show, edit, PDFs, archive, users)
+- [x] Category scope (6e): give A "Përmbarimore" (both) → sees all Përmbarimore lawsuits read only,
       Kryefaqja shows "Lëndët e mia" + "Qasje në këto kategori"; remove it → gone
-- [ ] "Lëndët e Mia" (6c) as admin / operator assigned to a lawsuit; history (6b) as admin
+- [x] "Lëndët e Mia" (6c) as admin / operator assigned to a lawsuit; history (6b) as admin
+- Step 7 checked by Ergon (all OK), confirmed 2026-11-16
 
 ### Step 8: Deploy (together with TODO_COURTS.md, same branch)
-- [ ] Commit, push, PR, merge into `main` (done by Ergon)
-- [ ] On the server: courts check (TODO_COURTS.md Step 0, read only) and note the counts
-- [ ] Backup on the server (pg_dump + rsync `storage/`, see the 2026-11-09 deploy)
-- [ ] `git pull` → `sudo docker-compose build` (no `--pull`) → `down` → `up -d` →
+- [x] Commit, push, PR, merge into `main` (done by Ergon)
+- [x] On the server: courts check (TODO_COURTS.md Step 0, read only) and note the counts
+- [x] Backup on the server (pg_dump + rsync `storage/`, see the 2026-11-09 deploy)
+- [x] `git pull` → `sudo docker-compose build` (no `--pull`) → `down` → `up -d` →
       `tailwindcss:build` → `restart`
-- [ ] 3 migrations run, none changes existing lawsuits: `lawsuit_representatives` (new empty table),
+- [x] 3 migrations run, none changes existing lawsuits: `lawsuit_representatives` (new empty table),
       `courts` (new table with the 12 courts), `users.category_scopes` (empty list for every user)
-- [ ] Courts check again: same counts as before; Admin → Gjykatat shows 12 active courts (+ inactive
+- [x] Courts check again: same counts as before; Admin → Gjykatat shows 12 active courts (+ inactive
       ones only if the check found unknown names)
 - [ ] Create the legal representative accounts in the Admin area, assign their lawsuits / categories
+      2026-11-16: 17 accounts (Albert Kadriu = Admin, 16 = Përfaqësues Ligjor, same starting password) with a
+      one-time script outside git (skips existing emails). Tested in local Docker: 17 created, second run
+      skips all 17. Still to do: run it on the server, then assign lawsuits / categories in the app
 - [ ] Tell the legal team: CSV export now shows full court names ("Gjykata Themelore" instead of `themelore`)
+- Deployed 2026-11-13 (PRs #26 + #27): 4 migrations ran, court counts identical before/after
+  (1161 lawsuits), 12 active courts. Backup: legal_app_20261113_0941.dump + storage_20261113
 
 ## Later (not now)
 - Legal representatives may add comments on their own lawsuits (only `comment?` changes).
